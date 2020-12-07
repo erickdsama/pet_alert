@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>974543061721-jbt1pgeltn90s57k2d1q0hg2mfc2akd1.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.974543061721-jbt1pgeltn90s57k2d1q0hg2mfc2akd1</string>
+	<key>API_KEY</key>
+	<string>AIzaSyALgSFwLlRvIcc9Kua9b_XXDmnXeUc02Cg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>974543061721</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>dev.kulu.petAlert</string>
+	<key>PROJECT_ID</key>
+	<string>petalert</string>
+	<key>STORAGE_BUCKET</key>
+	<string>petalert.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:974543061721:ios:f96b9b8a73b96f5a6434c8</string>
+	<key>DATABASE_URL</key>
+	<string>https://petalert-641a4.firebaseio.com</string>
+</dict>
+</plist>
