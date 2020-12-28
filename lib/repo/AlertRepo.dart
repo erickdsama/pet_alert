@@ -6,9 +6,10 @@ import 'package:pet_alert/models/AlertModel.dart';
 class AlertRepo{
 
   Future<List<AlertModel>> fetchMyAlerts() async{
-    var url = 'http://debian:5000/alert/';
+    var url = 'http://167.99.170.7:5000/alert/';
     final result = await http.get(url);
     if(result.statusCode != 200) {
+      print("res ${result.body}" );
       throw Exception("djnskjndjknkjsn");
     }else {
       return parsedJSON(result);
@@ -16,7 +17,7 @@ class AlertRepo{
   }
 
   Future<List<AlertModel>> fetchNearbyAlertPets(String lat, String lon) async{
-    var url = 'http://debian:5000/alert/$lon/$lat/';
+    var url = 'http://167.99.170.7:5000/alert/$lon/$lat/';
     final result = await http.get(url);
     if(result.statusCode != 200) {
       throw Exception("djnskjndjknkjsn");

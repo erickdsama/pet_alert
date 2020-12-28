@@ -10,20 +10,76 @@ import 'package:pet_alert/models/AlertModel.dart';
 import 'package:pet_alert/models/PetModel.dart';
 import 'package:pet_alert/styles.dart';
 import 'package:pet_alert/utils.dart';
+import 'package:couchbase_lite/couchbase_lite.dart';
 
 class ProfileScreen extends StatelessWidget {
   static const String id = 'ProfileScreen';
   final User user;
+  Database database;
+  Replicator replicator;
+  ListenerToken _dbListenerToken;
+
   ProfileScreen(
       this.user
       );
+
+  Future<String> replicate() async{
+    // Create replicators to push and pull changes to and from the cloud.
+    database = await Database.initWithName("pet_alert_messages");
+
+    ReplicatorConfiguration config =
+    ReplicatorConfiguration(database, "ws://192.168.3.6:4985/pet_alert/");
+      config.replicatorType = ReplicatorType.pushAndPull;
+    config.continuous = true;
+
+    config.authenticator = BasicAuthenticator("petApp", "passApp");
+    config.pullAttributeFilters = {
+      "sender": [1],
+      "receiver": [99]
+    };
+    var replicator = Replicator(config);
+    print(" >>> WHATPPPP??? $replicator");
+    ListenerToken _listenerToken;
+
+
+
+    // Listen to replicator change events.
+    _listenerToken = replicator.addChangeListener((ReplicatorChange event) {
+      if (event.status.error != null) {
+        print(">>>> Error: " + event.status.error);
+      }
+      print(" >>> data: ${event.status.activity.toString()}");
+    });
+    print("replica??????");
+
+
+
+    _dbListenerToken = database.addChangeListener((dbChange) {
+      for (var change in dbChange.documentIDs) {
+        database.document(change).then((value) => print("doc ${value}")).catchError((err)=>print("dsadsadsa $err"));
+
+        print("change in id: $change");
+      }
+    });
+    replicator.start();
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    PetBloc petBloc = BlocProvider.of(context);
-    AlertBloc alertBloc = BlocProvider.of(context);
 
-    petBloc.add(FetchPets());
-    alertBloc.add(FetchMyAlerts());
+    replicate();
+    BlocProvider.of<AlertBloc>(context).add(FetchMyAlerts());
+    BlocProvider.of<PetBloc>(context).listen((state) {
+      if(state is PetsInitialState) {
+        BlocProvider.of<PetBloc>(context).add(FetchPets());
+      }
+    });
+    BlocProvider.of<AlertBloc>(context).listen((state) {
+      if(state is AlertInitialState) {
+        BlocProvider.of<AlertBloc>(context).add(FetchMyAlerts());
+      }
+    });
 
     return CupertinoPageScaffold(
       backgroundColor: Colors.white,
@@ -78,7 +134,15 @@ class ProfileScreen extends StatelessWidget {
                       ],
                     ),
                     Divider(),
-                    Material(child: ListTile(title: Text("Mensajes", style: titleList,), trailing: Text("1"),)),
+                    Material(
+                        child: ListTile(
+                          title: Text("Mensajes", style: titleList,),
+                          trailing: Text("1"),
+                          onTap: () {
+                            Navigator.pushNamed(context, '/myChats', arguments: {});
+                            },
+                        )
+                    ),
                     Material(
                         child: ListTile(
                           onTap: () {
@@ -110,7 +174,7 @@ class ProfileScreen extends StatelessWidget {
                           trailing: BlocBuilder<AlertBloc, AlertState>(
                             builder: (context, state) {
                               if (state is AlertIsLoadedState) {
-                                List<AlertModel> alerts = state.alertModel;
+                                List<AlertModel> alerts = state.alertModels;
                                 return Text("${alerts.length}");
                               } else {
                                 return Text("");

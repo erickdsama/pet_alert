@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "974543061721",
+    "firebase_url": "https://petalert-641a4.firebaseio.com",
+    "project_id": "petalert",
+    "storage_bucket": "petalert.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:974543061721:android:8ed699ab56959af46434c8",
+        "android_client_info": {
+          "package_name": "dev.kulu.pet_alert"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "974543061721-n4vnas421r1a6j2untoo99m06ruu7qdg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.kulu.pet_alert",
+            "certificate_hash": "332aeb8d537317e80c086fe3f4c4a19dd3018bd0"
+          }
+        },
+        {
+          "client_id": "974543061721-tt7nd5r2on92kdgodmm2pvmlns6603e9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrCGlLLjdVlJ8PnaXMVUJArCCrP1mvNt0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "974543061721-tt7nd5r2on92kdgodmm2pvmlns6603e9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "974543061721-jbt1pgeltn90s57k2d1q0hg2mfc2akd1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "dev.kulu.petAlert"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

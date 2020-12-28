@@ -8,6 +8,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pet_alert/bloc/login/bloc.dart';
 import 'package:pet_alert/models/AlertModel.dart';
+import 'package:pet_alert/pages/forms/direct_message.dart';
 import 'package:pet_alert/services/AuthService.dart';
 import 'package:pet_alert/styles.dart';
 import 'package:pet_alert/widgets/list_comment_item.dart';
@@ -26,14 +27,11 @@ class PetDetailPage extends StatelessWidget{
   Set<Polygon> _polygons = Set<Polygon>();
   PetDetailPage({Key key, @required this.authService, this.alertModel}) : super(key: key);
 
-
-
   @override
   Widget build(BuildContext context) {
     //variables transform
     var parsedDate = DateTime.parse(alertModel.lost_date);
     String missingDate = timeago.format(parsedDate, locale: 'es');
-
 
     //google maps
     Completer<GoogleMapController> _controller = Completer();
@@ -54,8 +52,6 @@ class PetDetailPage extends StatelessWidget{
         fillColor: Color(0x440044BB),
         strokeColor: Color(0x440044BB)
     ));
-
-
 
     return new CupertinoPageScaffold(
       backgroundColor: Colors.white,
@@ -182,10 +178,25 @@ class PetDetailPage extends StatelessWidget{
                                     Row(
                                       children: [
                                         Expanded(
+                                          flex:9,
                                             child: Text("${alertModel.description}", softWrap: true, maxLines: 2,)
+                                        ),
+                                        Expanded(
+                                          flex: 1,
+                                          child: CupertinoButton(
+                                            child: Icon(Icons.message),
+                                            onPressed: (){
+
+                                            },
+                                          )
                                         ),
                                       ],
                                     ),
+                                    Row(
+                                      children: [
+                                        Expanded(child: DirectMessageForm())
+                                      ],
+                                    )
                                   ]
                               )
                           ),

@@ -34,24 +34,21 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
         yield AlertLoadingState();
         List<AlertModel> alertModel = await alertRepo.fetchNearbyAlertPets(event.lat, event.lon);
         if (alertModel != null) {
-          yield AlertIsLoadedState(alertModel: alertModel);
+          yield AlertIsLoadedState(alertModels: alertModel);
         } else {
           yield AlertIsNotLoadedState();
         }
       }catch(e){
         print("$e");
       }
-    } else if(event is RequestLocation) {
-      locationBloc.add(FetchLocationEvent());
-      yield AlertLoadingState();
     } else if(event is FetchMyAlerts) {
       try {
-        yield AlertLoadingState();
+        yield MyAlertsLoadingState();
         List<AlertModel> alertModel = await alertRepo.fetchMyAlerts();
         if (alertModel != null) {
-          yield AlertIsLoadedState(alertModel: alertModel);
+          yield MyAlertsIsLoadedState(alertModels: alertModel);
         } else {
-          yield AlertIsNotLoadedState();
+          yield MyAlertsIsNotLoadedState();
         }
       }catch(e){
         print("$e");

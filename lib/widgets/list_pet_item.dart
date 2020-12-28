@@ -19,7 +19,7 @@ class ListPetItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => {
-        Navigator.pushNamed(context, '/petDetail', arguments: {"data": ""})
+        Navigator.pushNamed(context, '/petDetail', arguments: petModel)
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -47,13 +47,13 @@ class ListPetItem extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      IconText(iconData: FontAwesome5Solid.dna, text: "chihuahua"),
+                      IconText(iconData: FontAwesome5Solid.dna, text: petModel.breed),
                       VerticalDivider(),
-                      IconText(iconData: FontAwesome5Solid.dna, text: "chihuahua"),
+                      IconText(iconData: Ionicons.ios_color_palette, text: petModel.color),
                       VerticalDivider(),
-                      IconText(iconData: FontAwesome5Solid.dna, text: "chihuahua"),
+                      IconText(iconData: (petModel.sex != 1) ? FontAwesome.mars : FontAwesome.venus, text:  (petModel.sex != 1) ? "Macho" : "Hembra" ),
                       VerticalDivider(),
-                      IconText(iconData: FontAwesome5Solid.dna, text: "chihuahua"),
+                      IconText(iconData: MaterialCommunityIcons.image_size_select_small, text: petModel.size),
                     ],
                   ),
                 ),
@@ -67,7 +67,6 @@ class ListPetItem extends StatelessWidget {
                           color: Colors.redAccent,
                           padding: EdgeInsets.all(8),
                           onPressed: (){
-
                       })
 
                     ],

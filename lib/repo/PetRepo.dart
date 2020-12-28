@@ -6,13 +6,30 @@ import 'package:pet_alert/models/PetModel.dart';
 class PetRepo{
 
   Future<List<PetModel>> fetchMyPets() async{
-    var url = 'http://debian:5000/pet/';
+    var url = 'http://167.99.170.7:5000/pet/';
 
     final result = await http.get(url);
     if(result.statusCode != 200) {
       throw Exception("PETTTTSSS ERROR");
     }else {
       return parsedJSON(result);
+    }
+  }
+
+  Future<PetModel> savePet(final data) async{
+    assert(data != null);
+
+    var url = 'http://167.99.170.7:5000/pet/';
+    print("sdad ${data.toJSON()}");
+    Map<String, String> headers = {
+      "Content-Type":"application/json"
+    };
+    final result = await http.post(url, body: data.toJSON(), headers: headers);
+    if(result.statusCode != 200) {
+      throw Exception("PETTTTSSS ERROR");
+    }else {
+      print("dsada ${result.body}");
+      return PetModel.fromJSON(json.decode(result.body));
     }
   }
 
@@ -24,5 +41,6 @@ class PetRepo{
     }
     return models;
   }
+
 
 }

@@ -5,7 +5,8 @@ class AlertModel{
   final description;
   final pet;
   final pet_id;
-  final lost_date;
+  int id;
+  String lost_date;
 
 
   AlertModel(this.lostPoint, this.description, this.pet, this.pet_id, this.lost_date);

@@ -6,7 +6,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 
 class ListAlertItem extends StatelessWidget {
-  final AlertModel alertModel;
+  final AlertModel  alertModel;
 
   ListAlertItem({Key key,
     @required this.alertModel,
@@ -20,9 +20,10 @@ class ListAlertItem extends StatelessWidget {
     var parsedDate = DateTime.parse(alertModel.lost_date);
     String missingDate = timeago.format(parsedDate, locale: 'es');
     return GestureDetector(
-      onTap: () => {
-        Navigator.pushNamed(context, '/petDetail', arguments: {"data": alertModel})
-      },
+      onTap: () {
+        Navigator.pushNamed(context, '/alertDetail', arguments: {"data": alertModel});
+
+    },
       child: Container(
           child: Padding(
             padding: EdgeInsets.all(16),

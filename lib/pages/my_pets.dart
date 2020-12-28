@@ -50,7 +50,6 @@ class MyPets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PetBloc petBloc = BlocProvider.of(context);
     return new CupertinoPageScaffold(
       backgroundColor: Colors.white,
       navigationBar: CupertinoNavigationBar(
@@ -63,29 +62,24 @@ class MyPets extends StatelessWidget {
           },
         ),
       ),
-      child: BlocConsumer<PetBloc, PetState>(
-        listener: (context, state){
-
-        },
+      child: BlocBuilder<PetBloc, PetState>(
           builder: (context, state){
+            print("dsalkjdlkasjldkjaslkdjlksajdlkasjdlkajlkjklsajdklsaj $state");
             if(state is PetsIsLoadedState) {
-              print("ya se cargaron");
               if (state.petsModel.length > -1) {
                 return ListView.builder(
                   padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
-                    itemCount: 10,
+                    itemCount: state.petsModel.length,
                     itemBuilder: (BuildContext ctx, int idx) {
-                      PetModel pet = PetModel("perrito", "https://i.ytimg.com/vi/h1pKSEeaNLM/maxresdefault.jpg", "1", "chihuahua");
                       return Dismissible(
                         movementDuration: Duration(seconds: 2),
                         dragStartBehavior: DragStartBehavior.down,
                         background: Container(color: Colors.redAccent,),
                         direction: DismissDirection.endToStart,
-                        key: Key(pet.id),
+                        key: Key(state.petsModel[idx].id),
                         onDismissed: (direction) {
-
                         },
-                        child: ListPetItem(petModel: pet,)
+                        child: ListPetItem(petModel: state.petsModel[idx],)
                       );
                     });
               } else {

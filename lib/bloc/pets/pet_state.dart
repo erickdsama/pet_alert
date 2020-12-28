@@ -23,3 +23,15 @@ class PetsIsLoadedState  extends PetState {
 
 class PetIsNotLoaded extends PetState {}
 
+
+class SavingPet extends PetState {}
+
+class SavedPet extends PetState {
+  final PetModel petModel;
+  SavedPet({@required this.petModel});
+
+  @override
+  List<Object> get props => [petModel];
+}
+
+class ErrorSavingPet extends PetState {}

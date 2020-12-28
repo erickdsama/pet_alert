@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pet_alert/bloc/alert_bloc.dart';
+import 'package:pet_alert/bloc/message_bloc.dart';
 import 'package:pet_alert/bloc/pets/bloc.dart';
 import 'package:pet_alert/globals.dart';
 import 'package:pet_alert/pages/login.dart';
@@ -52,34 +53,34 @@ void main() {
       BlocProvider<PetBloc>(
         create: (context) => PetBloc(petRepo),
       ),
+      BlocProvider<LocationBloc>(
+        create: (context) =>  locationBloc
+      ),
       BlocProvider<AlertBloc>(
         create: (context) => AlertBloc(alertRepo, locationBloc),
       ),
       BlocProvider<AuthBloc>(
         create: (context) => AuthBloc()),
+      BlocProvider<MessageBloc>(
+        create: (context) => MessageBloc()),
     ],
     child: Main(authService: authService,),
   ));
-
-//
-//  runApp(
-//    BlocProvider<AuthBloc>(
-//      create: (context) {
-//        return AuthBloc();
-//      },
-//      child: Main(authService: authService),
-//    ),
-//  );
 }
 
 class Main extends StatelessWidget {
 
   final AuthService authService;
   Main({Key key, @required this.authService}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-
     return new CupertinoApp(
+        localizationsDelegates: [
+          DefaultMaterialLocalizations.delegate,
+          DefaultCupertinoLocalizations.delegate,
+          DefaultWidgetsLocalizations.delegate,
+        ],
         theme:  CupertinoThemeData(
             primaryColor: primary,
             scaffoldBackgroundColor: primary
@@ -95,7 +96,6 @@ class Main extends StatelessWidget {
                     if(snapshot.connectionState == ConnectionState.done) {
                       User user = snapshot.data;
                       if (user != null) {
-                        print("user $user");
                         return MainPage(user: user,);
                       } else {
                         return LoginPage(authService: authService);

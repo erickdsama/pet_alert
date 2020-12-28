@@ -29,6 +29,14 @@ class PetBloc extends Bloc<PetsEvent, PetState> {
       }catch(e){
         print("$e");
       }
+    } else if(event is SavePet) {
+      yield SavingPet();
+      PetModel petModel = await petRepo.savePet(event.petModel);
+      if (petModel != null) {
+        yield SavedPet(petModel: petModel);
+      } else {
+        yield ErrorSavingPet();
+      }
     }
   }
 }

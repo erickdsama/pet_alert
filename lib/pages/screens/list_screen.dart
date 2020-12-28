@@ -7,6 +7,7 @@ import 'package:pet_alert/bloc/alert_event.dart';
 import 'package:pet_alert/bloc/alert_state.dart';
 import 'package:pet_alert/bloc/location/bloc.dart';
 import 'package:pet_alert/models/AlertModel.dart';
+import 'package:pet_alert/widgets/list_alert_item.dart';
 import 'package:pet_alert/widgets/list_widget_item.dart';
 
 import '../../styles.dart';
@@ -17,9 +18,6 @@ class ListScreen extends StatelessWidget {
   ListScreen(
       this.user
       );
-  Widget listAlertItem(AlertModel alertModel) {
-    return ListItemWidget(alertModel: alertModel);
-  }
 
   Widget notAlerts(){
     return Column(
@@ -39,8 +37,12 @@ class ListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AlertBloc alertBloc = BlocProvider.of(context);
-    alertBloc.add(RequestLocation());
+    BlocProvider.of<AlertBloc>(context).listen((state) {
+      if (state is AlertInitialState || state is MyAlertsIsLoadedState || state is MyAlertsLoadingState || state is MyAlertsLoadingState) {
+        print("DSLKFDSLKFDLFKLDKFLSDKFLSDKLFKSDLFKDSDKS $state");
+        BlocProvider.of<LocationBloc>(context).add(FetchLocationEvent());
+      }
+    });
     return CupertinoPageScaffold(
       backgroundColor: Colors.white,
       navigationBar: CupertinoNavigationBar(
@@ -49,18 +51,19 @@ class ListScreen extends StatelessWidget {
       ),
       child: GestureDetector(
         child: BlocBuilder<AlertBloc, AlertState>(
+          bloc:  BlocProvider.of<AlertBloc>(context),
           builder: (context, state){
             if (state is AlertInitialState) {
               return notAlerts();
             } else if(state is AlertLoadingState) {
               return CircularProgressIndicator();
             } else if( state is AlertIsLoadedState){
-              print("alert modell: ${state.alertModel}");
-              if (state.alertModel.length > 0) {
+              print("alert modell: ${state.alertModels}");
+              if (state.alertModels.length > 0) {
                 return ListView.builder(
-                    itemCount: state.alertModel.length,
+                    itemCount: state.alertModels.length,
                     itemBuilder: (BuildContext ctx, int idx) {
-                      return listAlertItem(state.alertModel[idx]);
+                      return ListAlertItem(alertModel: state.alertModels[idx]);
                     });
               } else {
                 return notAlerts();
