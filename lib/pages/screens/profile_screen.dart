@@ -25,18 +25,19 @@ class ProfileScreen extends StatelessWidget {
 
   Future<String> replicate() async{
     // Create replicators to push and pull changes to and from the cloud.
-    database = await Database.initWithName("pet_alert_messages");
+    database = await Database.initWithName("pet_alert_messa");
 
     ReplicatorConfiguration config =
-    ReplicatorConfiguration(database, "ws://192.168.3.6:4985/pet_alert/");
+    ReplicatorConfiguration(database, "ws://138.68.249.12:4984/pet_alert/");
       config.replicatorType = ReplicatorType.pushAndPull;
     config.continuous = true;
 
-    config.authenticator = BasicAuthenticator("petApp", "passApp");
-    config.pullAttributeFilters = {
-      "sender": [1],
-      "receiver": [99]
-    };
+//    config.authenticator = BasicAuthenticator("petApp", "passApp");
+    config.channels = ["sender22"];
+//    config.pullAttributeFilters = {
+//      "sender": [1],
+//      "receiver": [99]
+//    };
     var replicator = Replicator(config);
     print(" >>> WHATPPPP??? $replicator");
     ListenerToken _listenerToken;
