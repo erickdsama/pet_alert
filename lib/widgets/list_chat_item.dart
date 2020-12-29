@@ -15,6 +15,7 @@ class ListChatItem extends StatelessWidget {
 
     var parsedDate = DateTime.parse(this.chatModel.lastUpdate);
     String missingDate = timeago.format(parsedDate, locale: 'es');
+    print(">>>>>> ${chatModel.state}");
     return GestureDetector(
         onTap: () {
 
@@ -48,7 +49,7 @@ class ListChatItem extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text("${this.chatModel.receiver.name}", style: titleList,),
-                            Text("$missingDate", style: greyList, overflow: TextOverflow.fade, softWrap: true,),
+                            Text("$missingDate", style: this.chatModel.state != "new" ? greyList : labels, overflow: TextOverflow.fade, softWrap: true,),
                           ],
                         ),
                         Container( child: Text("$parsedDate", style: descList,))

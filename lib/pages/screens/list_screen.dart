@@ -37,12 +37,12 @@ class ListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<AlertBloc>(context).listen((state) {
-      if (state is AlertInitialState || state is MyAlertsIsLoadedState || state is MyAlertsLoadingState || state is MyAlertsLoadingState) {
-        print("DSLKFDSLKFDLFKLDKFLSDKFLSDKLFKSDLFKDSDKS $state");
+    BlocProvider.of<LocationBloc>(context).listen((state) {
+      if (state is LocationInitialState) {
         BlocProvider.of<LocationBloc>(context).add(FetchLocationEvent());
       }
     });
+
     return CupertinoPageScaffold(
       backgroundColor: Colors.white,
       navigationBar: CupertinoNavigationBar(
@@ -58,7 +58,6 @@ class ListScreen extends StatelessWidget {
             } else if(state is AlertLoadingState) {
               return CircularProgressIndicator();
             } else if( state is AlertIsLoadedState){
-              print("alert modell: ${state.alertModels}");
               if (state.alertModels.length > 0) {
                 return ListView.builder(
                     itemCount: state.alertModels.length,

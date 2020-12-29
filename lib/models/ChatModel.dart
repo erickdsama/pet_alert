@@ -8,8 +8,10 @@ class ChatModel{
   UserModel receiver;
   String id;
   String lastUpdate;
+  String state;
 
   ChatModel({
+    this.state,
     this.owner,
     this.receiver,
     this.id,

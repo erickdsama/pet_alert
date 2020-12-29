@@ -25,6 +25,8 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         } else {
           yield LocationErrorState();
         }
+        yield LocationErrorState();
+
       }catch(e){
         print("$e");
       }

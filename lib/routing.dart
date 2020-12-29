@@ -1,7 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pet_alert/bloc/alert_bloc.dart';
-import 'package:pet_alert/bloc/pets/bloc.dart';
 import 'package:pet_alert/models/AlertModel.dart';
 import 'package:pet_alert/pages/alert_detail.dart';
 import 'package:pet_alert/pages/chat_list.dart';
@@ -10,8 +7,6 @@ import 'package:pet_alert/pages/my_alerts.dart';
 import 'package:pet_alert/pages/my_pets.dart';
 import 'package:pet_alert/pages/new_pet.dart';
 import 'package:pet_alert/pages/pet_detail.dart';
-import 'package:pet_alert/repo/AlertRepo.dart';
-import 'package:pet_alert/repo/PetRepo.dart';
 import 'package:pet_alert/services/AuthService.dart';
 
 import 'pages/login.dart';

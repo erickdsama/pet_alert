@@ -69,7 +69,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    replicate();
+    // replicate();
     BlocProvider.of<AlertBloc>(context).add(FetchMyAlerts());
     BlocProvider.of<PetBloc>(context).listen((state) {
       if(state is PetsInitialState) {

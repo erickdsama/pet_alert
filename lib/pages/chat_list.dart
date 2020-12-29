@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:pet_alert/bloc/chat/chat_bloc.dart';
 import 'package:pet_alert/bloc/pets/bloc.dart';
 import 'package:pet_alert/models/ChatModel.dart';
 import 'package:pet_alert/models/PetModel.dart';
@@ -53,64 +54,49 @@ class ChatsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new CupertinoPageScaffold(
-        backgroundColor: Colors.white,
-        navigationBar: CupertinoNavigationBar(
-
-          middle: Text("Mis Conversaciones"),
-          trailing: CupertinoButton(
-            child: Icon(Icons.add),
-            onPressed: () {
-              Navigator.pushNamed(context, '/newMessage', arguments: {});
-            },
+    return BlocProvider<ChatBloc>(
+      create: (context) => ChatBloc(),
+      child: new CupertinoPageScaffold(
+          backgroundColor: Colors.white,
+          navigationBar: CupertinoNavigationBar(
+            middle: Text("Mis Conversaciones"),
+            trailing: CupertinoButton(
+              child: Icon(Icons.add),
+              onPressed: () {
+                Navigator.pushNamed(context, '/newMessage', arguments: {});
+              },
+            ),
           ),
-        ),
-        child: BlocBuilder<PetBloc, PetState>(
-            builder: (context, state){
-              if(state is PetsIsLoadedState) {
-                if (state.petsModel.length > -1) {
-
-                  List<ChatModel> chatModelList = [];
-                  ChatModel a = ChatModel(
-                    owner: new UserModel(
-                      age: 10,
-                      id: "1",
-                      name: "Erick",
-                      photo: "https://avatars3.githubusercontent.com/u/17994929?s=400&u=f0f900ffc441bf446785bce723e345dbec9bed40&v=4",
-                      sex: 1
-                    ),
-                    receiver: new UserModel(
-                        age: 10,
-                        id: "99",
-                        name: "Erick",
-                        photo: "https://avatars3.githubusercontent.com/u/17994929?s=400&u=f0f900ffc441bf446785bce723e345dbec9bed40&v=4",
-                        sex: 1
-                    ),
-                    lastUpdate: "2020-10-12 19:00:00"
-                  );
-                  chatModelList.add(a);
-                  return ListView.builder(
-                      padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
-                      itemCount: chatModelList.length,
-                      itemBuilder: (BuildContext ctx, int idx) {
-                        return Dismissible(
-                            movementDuration: Duration(seconds: 2),
-                            dragStartBehavior: DragStartBehavior.down,
-                            background: Container(color: Colors.redAccent,),
-                            direction: DismissDirection.endToStart,
-                            key: Key(state.petsModel[idx].id),
-                            onDismissed: (direction) {
-                            },
-                            child: ListChatItem(chatModel: chatModelList[idx],)
-                        );
-                      });
+          child: BlocBuilder<ChatBloc, ChatState>(
+              builder: (context, state){
+                if (state is ChatInitial) {
+                  BlocProvider.of<ChatBloc>(context).add(InitialChatEvent());
+                }
+                if(state is ChatLoadedState) {
+                  if (state.chats.length > -1) {
+                    return ListView.builder(
+                        padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
+                        itemCount: state.chats.length,
+                        itemBuilder: (BuildContext ctx, int idx) {
+                          return Dismissible(
+                              movementDuration: Duration(seconds: 2),
+                              dragStartBehavior: DragStartBehavior.down,
+                              background: Container(color: Colors.redAccent,),
+                              direction: DismissDirection.endToStart,
+                              key: Key(state.chats[idx].id),
+                              onDismissed: (direction) {
+                              },
+                              child: ListChatItem(chatModel: state.chats[idx],)
+                          );
+                        });
+                  } else {
+                    return notChats(context);
+                  }
                 } else {
                   return notChats(context);
                 }
-              } else {
-                return notChats(context);
-              }
-            })
+              })
+      ),
     );
   }
 }
