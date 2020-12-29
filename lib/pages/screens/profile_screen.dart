@@ -33,11 +33,11 @@ class ProfileScreen extends StatelessWidget {
     config.continuous = true;
 
 //    config.authenticator = BasicAuthenticator("petApp", "passApp");
-    config.channels = ["sender22"];
-//    config.pullAttributeFilters = {
-//      "sender": [1],
-//      "receiver": [99]
-//    };
+//    config.channels = ["sender22"];
+    config.pullAttributeFilters = {
+      "sender": [1],
+      "receiver": [99]
+    };
     var replicator = Replicator(config);
     print(" >>> WHATPPPP??? $replicator");
     ListenerToken _listenerToken;

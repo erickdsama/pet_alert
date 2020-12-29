@@ -13,6 +13,7 @@ part 'chat_event.dart';
 part 'chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
+  String database_name = "pet_alert_939392090989";
   Database database;
   Replicator replicator;
   List<ChatModel> chats = [];
@@ -30,23 +31,25 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ChatEvent event,
   ) async* {
     if (event is InitialChatEvent) {
-      database = await Database.initWithName("pet_alert_chats12232");
+      database = await Database.initWithName(database_name);
       ReplicatorConfiguration config =
       ReplicatorConfiguration(database, "ws://138.68.249.12:4984/pet_alert/");
       config.replicatorType = ReplicatorType.pushAndPull;
       config.continuous = true;
+      config.channels = ["sender_22"];
+
       replicator = Replicator(config);
       yield ChatListenState();
-
 
       _listenerToken = replicator.addChangeListener((ReplicatorChange event) {
         if (event.status.error != null) {
         }
       });
 
+
       // Create a query to fetch documents.
       var query = QueryBuilder.select([SelectResult.all(), SelectResult.expression(Meta.id)])
-          .from("pet_alert_chats12232");
+          .from(database_name);
       // Run the query.
       try {
         var result = await query.execute();
@@ -116,6 +119,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     await replicator?.removeChangeListener(_listenerToken);
     await replicator?.stop();
     await replicator?.dispose();
+    await database?.removeChangeListener(_dbListenerToken);
     await database?.close();
     return super.close();
   }
