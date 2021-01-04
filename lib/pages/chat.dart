@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:pet_alert/bloc/chat/chat_bloc.dart';
@@ -16,6 +17,7 @@ class Chat extends StatelessWidget {
 
   UserRepo userRepo;
   ChatModel chatModel;
+  MessageBloc messageBloc;
   Widget notChats(context){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -54,53 +56,86 @@ class Chat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (userRepo == null) {
-      userRepo = UserRepo();
-    }
-    //estoy revisando como crear la lista de mensajes, lo mas seguro es que debo de usar
-    // un listener document, pero por el moemnto solo quiero abrir messages
-
-    BlocProvider.of<ChatBloc>(context).listen((state) {
-      print("state $state");
-
-    });
-    return BlocProvider<MessageBloc>(
-      create: (context) => MessageBloc(chatModel.id, BlocProvider.of<ChatBloc>(context)),
+    messageBloc = MessageBloc(chatModel.id, BlocProvider.of<ChatBloc>(context));
+    return BlocProvider<MessageBloc>.value(
+      value: messageBloc,
       child: new CupertinoPageScaffold(
           backgroundColor: Colors.white,
           navigationBar: CupertinoNavigationBar(
             middle: Text(chatModel.receiver.name),
           ),
-          child: BlocBuilder<MessageBloc, MessageState>(
-              builder: (context, state){
+          child: Stack(
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  BlocBuilder<MessageBloc, MessageState>(
+                      builder: (context, state){
+                        if (state is MessageInitial) {
+                          BlocProvider.of<MessageBloc>(context).add(ListenerMessages(docId: chatModel.id));
+                        }
+                        if(state is NewMessages) {
+                            if (state.messages.length > -1) {
+                            return Flexible(
+                              child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: state.messages.length,
+                                  itemBuilder: (BuildContext ctx, int idx) {
+                                    return Dismissible(
+                                        movementDuration: Duration(seconds: 2),
+                                        dragStartBehavior: DragStartBehavior.down,
+                                        background: Container(color: Colors.redAccent,),
+                                        direction: DismissDirection.endToStart,
+                                        key: Key(state.messages[idx].id),
+                                        onDismissed: (direction) {
+                                        },
+                                        child: ListMessageItem(messageModel: state.messages[idx])
+                                    );
+                                  }),
+                            );
+                          } else {
+                            return notChats(context);
+                          }
+                        } else {
+                          return notChats(context);
+                        }
+                      }),
+                    Row(
+                      children: [
+                        Expanded(
+                            flex: 8,
+                            child: CupertinoTextField(
+                              placeholder: "Enviar Mensaje",
+                              maxLines: 2,
+                            )
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: CupertinoButton(
+                            child: Text("Enviar"),
+                            onPressed: () {
 
-                if (state is MessageInitial) {
-                  BlocProvider.of<MessageBloc>(context).add(ListenerMessages(docId: chatModel.id));
-                }
-                if(state is NewMessages) {
-                    if (state.messages.length > -1) {
-                    return ListView.builder(
-                        padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
-                        itemCount: state.messages.length,
-                        itemBuilder: (BuildContext ctx, int idx) {
-                          return Dismissible(
-                              movementDuration: Duration(seconds: 2),
-                              dragStartBehavior: DragStartBehavior.down,
-                              background: Container(color: Colors.redAccent,),
-                              direction: DismissDirection.endToStart,
-                              key: Key(state.messages[idx].id),
-                              onDismissed: (direction) {
-                              },
-                              child: ListMessageItem(messageModel: state.messages[idx])
-                          );
-                        });
-                  } else {
-                    return notChats(context);
-                  }
-                } else {
-                  return notChats(context);
-                }
-              })
+                            },
+                          ),
+                        )
+                      ],
+                    )
+//                  Row(
+//                    children: [
+//                      CupertinoTextField(
+//                        placeholder: "Enviar mensaje",
+//
+//                      ),
+//                      CupertinoButton(child: Text("enviar"), onPressed: (){
+//
+//                      })
+//                    ],
+//                  )
+
+                ],
+              ),
+            ],
+          )
       ),
     );
   }
