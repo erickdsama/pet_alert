@@ -7,7 +7,10 @@ import 'package:pet_alert/models/UserModel.dart';
 class UserRepo{
 
   Future<List<UserModel>> fetchUsers(List<String> users) async{
-    var url = 'http://167.99.170.7:5000/user/';
+    String url_args = users.join("&id=");
+    print("users $users");
+    print("ar $url_args");
+    var url = 'http://167.99.170.7:5000/owner?id='+url_args;
     final result = await http.get(url);
     if(result.statusCode != 200) {
       print("res ${result.body}" );

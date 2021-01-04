@@ -10,61 +10,15 @@ import 'package:pet_alert/models/AlertModel.dart';
 import 'package:pet_alert/models/PetModel.dart';
 import 'package:pet_alert/styles.dart';
 import 'package:pet_alert/utils.dart';
-import 'package:couchbase_lite/couchbase_lite.dart';
 
 class ProfileScreen extends StatelessWidget {
   static const String id = 'ProfileScreen';
   final User user;
-  Database database;
-  Replicator replicator;
-  ListenerToken _dbListenerToken;
 
   ProfileScreen(
       this.user
       );
 
-  Future<String> replicate() async{
-    // Create replicators to push and pull changes to and from the cloud.
-    database = await Database.initWithName("pet_alert_messa");
-
-    ReplicatorConfiguration config =
-    ReplicatorConfiguration(database, "ws://138.68.249.12:4984/pet_alert/");
-      config.replicatorType = ReplicatorType.pushAndPull;
-    config.continuous = true;
-
-//    config.authenticator = BasicAuthenticator("petApp", "passApp");
-//    config.channels = ["sender22"];
-    config.pullAttributeFilters = {
-      "sender": [1],
-      "receiver": [99]
-    };
-    var replicator = Replicator(config);
-    print(" >>> WHATPPPP??? $replicator");
-    ListenerToken _listenerToken;
-
-
-
-    // Listen to replicator change events.
-    _listenerToken = replicator.addChangeListener((ReplicatorChange event) {
-      if (event.status.error != null) {
-        print(">>>> Error: " + event.status.error);
-      }
-      print(" >>> data: ${event.status.activity.toString()}");
-    });
-    print("replica??????");
-
-
-
-    _dbListenerToken = database.addChangeListener((dbChange) {
-      for (var change in dbChange.documentIDs) {
-        database.document(change).then((value) => print("doc ${value}")).catchError((err)=>print("dsadsadsa $err"));
-
-        print("change in id: $change");
-      }
-    });
-    replicator.start();
-
-  }
 
   @override
   Widget build(BuildContext context) {

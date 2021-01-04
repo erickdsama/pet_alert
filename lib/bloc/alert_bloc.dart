@@ -12,7 +12,6 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
   AlertBloc(this.alertRepo, this.locationBloc){
     locationBlocSuscription = this.locationBloc.listen((state) {
       if (state is LocationIsFetchedState) {
-        print("ALERT BLOCK INSIDE ${state.position}");
         add(FetchAlerts(lat: state.position.latitude.toString(), lon: state.position.longitude.toString()));
       }
     });

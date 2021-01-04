@@ -1,18 +1,28 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pet_alert/bloc/chat/chat_bloc.dart';
 import 'package:pet_alert/models/AlertModel.dart';
+import 'package:pet_alert/models/ChatModel.dart';
 import 'package:pet_alert/pages/alert_detail.dart';
+import 'package:pet_alert/pages/chat.dart';
 import 'package:pet_alert/pages/chat_list.dart';
 import 'package:pet_alert/pages/main_page.dart';
 import 'package:pet_alert/pages/my_alerts.dart';
 import 'package:pet_alert/pages/my_pets.dart';
 import 'package:pet_alert/pages/new_pet.dart';
 import 'package:pet_alert/pages/pet_detail.dart';
+import 'package:pet_alert/repo/user_repo.dart';
 import 'package:pet_alert/services/AuthService.dart';
 
 import 'pages/login.dart';
 
+
+UserRepo userRepo = UserRepo();
+
 class Routing{
-  static Route<dynamic>generateRouting(settings) {
+  ChatBloc chatBloc = ChatBloc(userRepo);
+
+  Route<dynamic>generateRouting(settings) {
 
     final args = settings.arguments;
     switch(settings.name) {
@@ -49,7 +59,28 @@ class Routing{
         break;
       case '/myChats':
         return CupertinoPageRoute(
-            builder: (_) => new ChatsList()
+            builder: (_) {
+              return BlocProvider.value(
+                value: chatBloc,
+                child: ChatsList(),
+              );
+            }
+        );
+        break;
+      case '/chat':
+        ChatModel chatModel;
+        if (args is Map) {
+          if (args.containsKey("data")) {
+            chatModel = args["data"];
+          }
+        }
+        return CupertinoPageRoute(
+            builder: (_) {
+              return BlocProvider.value(
+                value: chatBloc,
+                child: Chat(chatModel: chatModel,),
+              );
+            }
         );
         break;
       case '/alertDetail':

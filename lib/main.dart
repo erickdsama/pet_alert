@@ -61,8 +61,6 @@ void main() {
       ),
       BlocProvider<AuthBloc>(
         create: (context) => AuthBloc()),
-      BlocProvider<MessageBloc>(
-        create: (context) => MessageBloc()),
     ],
     child: Main(authService: authService,),
   ));
@@ -73,6 +71,7 @@ class Main extends StatelessWidget {
 
   final AuthService authService;
   Main({Key key, @required this.authService}) : super(key: key);
+  Routing routing = Routing();
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +87,7 @@ class Main extends StatelessWidget {
         ),
         debugShowCheckedModeBanner: true,
         title: appName,
-        onGenerateRoute: Routing.generateRouting,
+        onGenerateRoute: routing.generateRouting,
         home: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state){
               return FutureBuilder(

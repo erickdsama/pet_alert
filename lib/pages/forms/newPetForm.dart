@@ -94,7 +94,6 @@ class _NewPetForm extends State<NewPetForm> {
                             Text("Nombre de la mascota", style: labels),
                             TextFormField(
                               onSaved: (cosa){
-                                print("primero");
                                 _petModel.name = cosa;
                               },
                             ),
@@ -141,9 +140,7 @@ class _NewPetForm extends State<NewPetForm> {
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
                                   onPressed: (index) {
                                     setState(() {
-                                      print("index $index, $_selectedType");
                                       _selectedType[index] = !_selectedType[index];
-                                      print(_selectedType);
                                     });
                                   },
 
@@ -178,7 +175,6 @@ class _NewPetForm extends State<NewPetForm> {
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
                                   onPressed: (index) {
                                     setState(() {
-                                      print("index $index, $_selectedSex");
                                       _petModel.sex = index;
                                       if (index == 0) {
                                         _selectedSex[0] = true;

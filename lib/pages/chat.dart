@@ -4,20 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:pet_alert/bloc/chat/chat_bloc.dart';
-import 'package:pet_alert/bloc/pets/bloc.dart';
+import 'package:pet_alert/bloc/message_bloc.dart';
 import 'package:pet_alert/models/ChatModel.dart';
-import 'package:pet_alert/models/PetModel.dart';
-import 'package:pet_alert/models/UserModel.dart';
 import 'package:pet_alert/repo/user_repo.dart';
-import 'package:pet_alert/widgets/list_chat_item.dart';
-import 'package:pet_alert/widgets/list_pet_item.dart';
+import 'package:pet_alert/widgets/list_messages_item.dart';
 
 import '../styles.dart';
 
 
-class ChatsList extends StatelessWidget {
+class Chat extends StatelessWidget {
 
   UserRepo userRepo;
+  ChatModel chatModel;
   Widget notChats(context){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -46,46 +44,54 @@ class ChatsList extends StatelessWidget {
           ),
           onPressed: () {
             Navigator.pushNamed(context, '/newPet', arguments: {});
-
           },
         )
       ],
     );
   }
 
+  Chat({this.chatModel});
+
   @override
   Widget build(BuildContext context) {
-    return new CupertinoPageScaffold(
+    if (userRepo == null) {
+      userRepo = UserRepo();
+    }
+    //estoy revisando como crear la lista de mensajes, lo mas seguro es que debo de usar
+    // un listener document, pero por el moemnto solo quiero abrir messages
+
+    BlocProvider.of<ChatBloc>(context).listen((state) {
+      print("state $state");
+
+    });
+    return BlocProvider<MessageBloc>(
+      create: (context) => MessageBloc(chatModel.id, BlocProvider.of<ChatBloc>(context)),
+      child: new CupertinoPageScaffold(
           backgroundColor: Colors.white,
           navigationBar: CupertinoNavigationBar(
-            middle: Text("Mis Conversaciones"),
-            trailing: CupertinoButton(
-              child: Icon(Icons.add),
-              onPressed: () {
-                Navigator.pushNamed(context, '/newMessage', arguments: {});
-              },
-            ),
+            middle: Text(chatModel.receiver.name),
           ),
-          child: BlocBuilder<ChatBloc, ChatState>(
+          child: BlocBuilder<MessageBloc, MessageState>(
               builder: (context, state){
-                if (state is ChatInitial) {
-                  BlocProvider.of<ChatBloc>(context).add(InitialChatEvent());
+
+                if (state is MessageInitial) {
+                  BlocProvider.of<MessageBloc>(context).add(ListenerMessages(docId: chatModel.id));
                 }
-                if(state is ChatLoadedState) {
-                  if (state.chats.length > -1) {
+                if(state is NewMessages) {
+                    if (state.messages.length > -1) {
                     return ListView.builder(
                         padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
-                        itemCount: state.chats.length,
+                        itemCount: state.messages.length,
                         itemBuilder: (BuildContext ctx, int idx) {
                           return Dismissible(
                               movementDuration: Duration(seconds: 2),
                               dragStartBehavior: DragStartBehavior.down,
                               background: Container(color: Colors.redAccent,),
                               direction: DismissDirection.endToStart,
-                              key: Key(state.chats[idx].id),
+                              key: Key(state.messages[idx].id),
                               onDismissed: (direction) {
                               },
-                              child: ListChatItem(chatModel: state.chats[idx],)
+                              child: ListMessageItem(messageModel: state.messages[idx])
                           );
                         });
                   } else {
@@ -95,6 +101,7 @@ class ChatsList extends StatelessWidget {
                   return notChats(context);
                 }
               })
-      );
+      ),
+    );
   }
 }

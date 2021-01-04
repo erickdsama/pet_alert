@@ -14,3 +14,22 @@ class SendMessage extends MessageEvent {
   @override
   List<Object> get props => [message];
 }
+
+class ListenerMessages extends MessageEvent {
+  final String docId;
+
+  ListenerMessages({@required this.docId});
+
+  @override
+  List<Object> get props => [docId];
+}
+
+
+class UpdateMessages extends MessageEvent {
+  final List<MessageModel> messages;
+
+  UpdateMessages({@required this.messages});
+
+  @override
+  List<Object> get props => [messages];
+}
