@@ -13,7 +13,7 @@ class ListChatItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    var parsedDate = DateTime.parse(this.chatModel.lastUpdate);
+    var parsedDate = DateTime.parse(this.chatModel.messages.last.sent);
     String missingDate = timeago.format(parsedDate, locale: 'es');
     return GestureDetector(
         onTap: () {

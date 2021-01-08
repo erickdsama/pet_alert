@@ -13,6 +13,8 @@ class ChatInitial extends ChatState {}
 
 class ChatListenState extends ChatState {}
 
+class ChatChangeData extends ChatState {}
+
 class ChatLoadedState extends ChatState {
   final List<ChatModel> chats;
 

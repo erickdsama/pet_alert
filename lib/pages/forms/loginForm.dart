@@ -8,6 +8,8 @@ import 'package:pet_alert/bloc/login/login_state.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:pet_alert/models/UserModel.dart';
+import 'package:pet_alert/repo/user_repo.dart';
 
 class LoginForm extends StatefulWidget{
   @override
@@ -26,10 +28,19 @@ _signInWithGoogle(context) async {
   final User user =
       (await FirebaseAuth.instance.signInWithCredential(credential)).user;
   if (user != null) {
-    Navigator.popAndPushNamed(context, '/listPets', arguments: {});
+//    Navigator.popAndPushNamed(context, '/listPets', arguments: {});
+    UserRepo userRepo = UserRepo();
+    UserModel userModel = UserModel(
+      name: user.displayName,
+      photo: user.photoURL,
+      gUser: user.uid,
+      email: user.email
+
+    );
+    userRepo.postUser(userModel);
 
   }
-  print("user: $user");
+  print("USSSSEEEEERRRRR: $user");
 }
 
 class _LoginFormState extends State<LoginForm> {

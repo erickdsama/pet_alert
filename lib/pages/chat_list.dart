@@ -4,13 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:pet_alert/bloc/chat/chat_bloc.dart';
-import 'package:pet_alert/bloc/pets/bloc.dart';
-import 'package:pet_alert/models/ChatModel.dart';
-import 'package:pet_alert/models/PetModel.dart';
-import 'package:pet_alert/models/UserModel.dart';
 import 'package:pet_alert/repo/user_repo.dart';
 import 'package:pet_alert/widgets/list_chat_item.dart';
-import 'package:pet_alert/widgets/list_pet_item.dart';
 
 import '../styles.dart';
 
@@ -75,7 +70,6 @@ class ChatsList extends StatelessWidget {
                 if(state is ChatLoadedState) {
                   if (state.chats.length > -1) {
                     ListView list =  ListView.builder(
-                        padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
                         controller: _scrollController,
                         itemCount: state.chats.length,
                         itemBuilder: (BuildContext ctx, int idx) {

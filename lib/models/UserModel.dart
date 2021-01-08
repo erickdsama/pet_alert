@@ -4,15 +4,19 @@ import 'dart:convert';
 class UserModel{
   String name;
   String photo;
+  String email;
   String id;
   double age;
   int sex;
+  String gUser;
 
   UserModel({
     this.name,
     this.photo,
     this.id,
+    this.email,
     this.age,
+    this.gUser,
     this.sex});
 
 
@@ -28,9 +32,11 @@ class UserModel{
   String toJSON() {
     return jsonEncode(<String, dynamic>{
       'name': this.name,
-      'photo': "https://c.files.bbci.co.uk/EB24/production/_112669106_66030514-b1c2-4533-9230-272b8368e25f.jpg",
+      'photo': this.photo,
+      'email': this.email,
+      'g_user': this.gUser,
       // 'age': this.age, todo fix api problem
-      'sex': this.sex,
+//      'sex': this.sex,
     });
   }
 

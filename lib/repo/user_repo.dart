@@ -14,22 +14,41 @@ class UserRepo{
     final result = await http.get(url);
     if(result.statusCode != 200) {
       print("res ${result.body}" );
-      throw Exception("djnskjndjknkjsn");
+      throw Exception("Error fetching users");
     }else {
       return parsedJSON(result);
     }
   }
 
+
+  Future<UserModel> postUser(data) async{
+    assert(data != null);
+
+    var url = 'http://167.99.170.7:5000/owner';
+    Map<String, String> headers = {
+      "Content-Type":"application/json"
+    };
+    final result = await http.post(url, body: data.toJSON(), headers: headers);
+    print("res  ${result.body}");
+    if(result.statusCode != 200) {
+      throw Exception("Error posting user");
+    }else {
+      return UserModel.fromJSON(jsonDecode(result.body));
+    }
+  }
+
+
   Future<UserModel> getMe() async{
     var url = 'http://167.99.170.7:5000/me';
     final result = await http.get(url);
     if(result.statusCode != 200) {
-      throw Exception("djnskjndjknkjsn");
+      throw Exception("Error get my user");
     }else {
       return UserModel.fromJSON(jsonDecode(result.body));
     }
-
   }
+
+
   List<UserModel> parsedJSON(final response) {
     final jsonDecoded = json.decode(response.body);
     List<UserModel> models = [];
