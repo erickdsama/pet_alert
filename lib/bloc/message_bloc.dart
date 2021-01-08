@@ -15,26 +15,25 @@ part 'message_state.dart';
 class MessageBloc extends Bloc<MessageEvent, MessageState> {
   Database database;
 
-  final String databaseName = "pet_alert_9393";
-  final String docId;
+  final String databaseName = "pet_alert_939322";
+  final ChatModel chatModel;
+  ListenerToken _listenerToken;
   Replicator replicator;
   ChatBloc chatBloc;
   StreamSubscription listChatSubscription;
-  MessageBloc(this.docId, this.chatBloc){
+
+  MessageBloc(this.chatModel, this.chatBloc){
     listChatSubscription = this.chatBloc.listen((state) {
       if (state is ChatLoadedState) {
         List<ChatModel> chats = state.chats;
         for(var chat in chats) {
-          if (chat.id == this.docId) {
+          if (chat.id == this.chatModel.id) {
             add(UpdateMessages(messages: chat.messages));
           }
         }
       }
     });
   }
-
-  ListenerToken _listenerToken;
-
 
   @override
   MessageState get initialState => MessageInitial();
@@ -62,6 +61,27 @@ class MessageBloc extends Bloc<MessageEvent, MessageState> {
     } else if(event is UpdateMessages) {
       yield(GettingMessages());
       yield(NewMessages(messages: event.messages));
+    } else if(event is SendMessage) {
+      yield SendingMessage();
+      String message = event.message;
+      Document doc = await database.document(this.chatModel.id);
+      List<dynamic> chat  = doc.getList("chat");
+      chat.add(
+        MessageModel(
+          state: "new",
+          message: message,
+          id: UniqueKey().toString(),
+          owner: this.chatModel.owner,
+          receiver: this.chatModel.receiver,
+          sent: DateTime.now().millisecondsSinceEpoch.toString(),
+        ).toMap()
+      );
+      doc = (await database.document(doc.id))
+          ?.toMutable()
+          ?.setList("chat", chat);
+      if (doc != null) {
+        await database.saveDocument(doc);
+      }
     }
   }
 

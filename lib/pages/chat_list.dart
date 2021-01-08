@@ -17,6 +17,7 @@ import '../styles.dart';
 
 class ChatsList extends StatelessWidget {
 
+  ScrollController _scrollController = ScrollController();
   UserRepo userRepo;
   Widget notChats(context){
     return Column(
@@ -73,8 +74,9 @@ class ChatsList extends StatelessWidget {
                 }
                 if(state is ChatLoadedState) {
                   if (state.chats.length > -1) {
-                    return ListView.builder(
+                    ListView list =  ListView.builder(
                         padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
+                        controller: _scrollController,
                         itemCount: state.chats.length,
                         itemBuilder: (BuildContext ctx, int idx) {
                           return Dismissible(
@@ -88,6 +90,7 @@ class ChatsList extends StatelessWidget {
                               child: ListChatItem(chatModel: state.chats[idx],)
                           );
                         });
+                    return list;
                   } else {
                     return notChats(context);
                   }

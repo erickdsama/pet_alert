@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -54,9 +56,12 @@ class Chat extends StatelessWidget {
 
   Chat({this.chatModel});
 
+  TextEditingController _messageController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
-    messageBloc = MessageBloc(chatModel.id, BlocProvider.of<ChatBloc>(context));
+    messageBloc = MessageBloc(chatModel, BlocProvider.of<ChatBloc>(context));
     return BlocProvider<MessageBloc>.value(
       value: messageBloc,
       child: new CupertinoPageScaffold(
@@ -75,11 +80,16 @@ class Chat extends StatelessWidget {
                           BlocProvider.of<MessageBloc>(context).add(ListenerMessages(docId: chatModel.id));
                         }
                         if(state is NewMessages) {
+                          Timer(
+                              Duration(milliseconds: 300),
+                                  () => _scrollController
+                                  .jumpTo(_scrollController.position.maxScrollExtent));
                             if (state.messages.length > -1) {
                             return Flexible(
                               child: ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: state.messages.length,
+                                  controller: _scrollController,
                                   itemBuilder: (BuildContext ctx, int idx) {
                                     return Dismissible(
                                         movementDuration: Duration(seconds: 2),
@@ -106,6 +116,7 @@ class Chat extends StatelessWidget {
                             flex: 8,
                             child: CupertinoTextField(
                               placeholder: "Enviar Mensaje",
+                              controller: _messageController,
                               maxLines: 2,
                             )
                         ),
@@ -114,24 +125,13 @@ class Chat extends StatelessWidget {
                           child: CupertinoButton(
                             child: Text("Enviar"),
                             onPressed: () {
-
+                              messageBloc.add(SendMessage(message: _messageController.text));
+                              _messageController.clear();
                             },
                           ),
                         )
                       ],
                     )
-//                  Row(
-//                    children: [
-//                      CupertinoTextField(
-//                        placeholder: "Enviar mensaje",
-//
-//                      ),
-//                      CupertinoButton(child: Text("enviar"), onPressed: (){
-//
-//                      })
-//                    ],
-//                  )
-
                 ],
               ),
             ],

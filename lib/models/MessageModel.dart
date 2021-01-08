@@ -30,6 +30,17 @@ class MessageModel{
         message: json['message'].toString());
   }
 
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'sender': int.parse(this.owner.id),
+      'receiver': int.parse(this.receiver.id),
+      'message': this.message,
+      'timestamp': int.parse(this.sent),
+      'state': this.state,
+      'id': this.id,
+    };
+  }
+
   String toJSON() {
     return jsonEncode(<String, dynamic>{
       'owner': this.owner.id,

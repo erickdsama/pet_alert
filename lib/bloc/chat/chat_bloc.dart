@@ -16,7 +16,7 @@ part 'chat_event.dart';
 part 'chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
-  String database_name = "pet_alert_9393";
+  String database_name = "pet_alert_939322";
   Database database;
   Replicator replicator;
   List<ChatModel> chats = [];
