@@ -12,12 +12,17 @@ import 'package:pet_alert/widgets/list_widget_item.dart';
 
 import '../../styles.dart';
 
-class ListScreen extends StatelessWidget {
+class ListScreen extends StatefulWidget {
   static const String id = 'ListScreen';
-  final User user;
-  ListScreen(
-      this.user
-      );
+  ListScreen();
+
+  @override
+  _ListScreenState createState() => _ListScreenState();
+}
+
+class _ListScreenState extends State<ListScreen> {
+  AlertBloc alertBloc;
+  LocationBloc locationBloc;
 
   Widget notAlerts(){
     return Column(
@@ -36,12 +41,21 @@ class ListScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    BlocProvider.of<LocationBloc>(context).listen((state) {
+  void initState() {
+    alertBloc = BlocProvider.of<AlertBloc>(context);
+    locationBloc = BlocProvider.of<LocationBloc>(context);
+    locationBloc.listen((state) {
       if (state is LocationInitialState) {
-        BlocProvider.of<LocationBloc>(context).add(FetchLocationEvent());
+        print("fetching.,,,,");
+        locationBloc.add(FetchLocationEvent());
       }
     });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
 
     return CupertinoPageScaffold(
       backgroundColor: Colors.white,
@@ -73,5 +87,11 @@ class ListScreen extends StatelessWidget {
         )
         ),
     );
+  }
+
+  @override
+  void dispose() {
+    alertBloc?.close();
+    super.dispose();
   }
 }

@@ -9,6 +9,7 @@ import 'package:meta/meta.dart';
 import 'package:pet_alert/globals.dart';
 import 'package:pet_alert/models/ChatModel.dart';
 import 'package:pet_alert/models/UserModel.dart';
+import 'package:pet_alert/repo/couchbase_repo.dart';
 import 'package:pet_alert/repo/user_repo.dart';
 
 import '../../utils.dart';
@@ -19,12 +20,8 @@ part 'chat_state.dart';
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   List<ChatModel> chats = [];
   UserRepo userRepo;
-  ListenerToken _dbListenerToken;
-  ListenerToken _listenerToken;
-  Database database;
-  Replicator replicator;
   ChatBloc(this.userRepo);
-
+  CouchBaseRepo couchBaseRepo;
 
   dynamic getResultDataCB(result, key) {
     return result.toMap()[key];
@@ -33,14 +30,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   @override
   ChatState get initialState => ChatInitial();
 
-
   Future<Map<String,UserModel>> getAllDocsUsers(List<Document> result) async {
     print("result $result");
     Map<String, UserModel> idUsersModel = {};
     List<String> idsSender = result.map((x) => getResultData(x, "sender").toString()).toList();
     List<String> idsReceiver = result.map((x) => getResultData(x, "receiver").toString()).toList();
     List<String> allUsers = new List.from(idsSender)..addAll(idsReceiver);
-    allUsers.toSet().toList();
+    allUsers = allUsers.toSet().toList();
+    allUsers.remove('null');
+    if (allUsers.length <= 0 ) {
+      return {};
+    }
     if (allUsers.length <= 0 ) {
       return {};
     }
@@ -56,7 +56,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     List<String> idsSender = result.allResults().map((x) => getResultData(x, "sender").toString()).toList();
     List<String> idsReceiver = result.allResults().map((x) => getResultData(x, "receiver").toString()).toList();
     List<String> allUsers = new List.from(idsSender)..addAll(idsReceiver);
-    allUsers.toSet().toList();
+    allUsers = allUsers.toSet().toList();
+    allUsers.remove('null');
     if (allUsers.length <= 0 ) {
       return {};
     }
@@ -74,72 +75,65 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async* {
     Map<String, UserModel> idUserModel = {};
     if (event is InitialChatEvent) {
-      database = await Database.initWithName(database_name);
-      ReplicatorConfiguration config = ReplicatorConfiguration(database, "ws://138.68.249.12:4984/pet_alert/");
-      config.replicatorType = ReplicatorType.pushAndPull;
-      config.continuous = true;
-      config.channels = ["sender_1"];
-
-      replicator = Replicator(config);
+      couchBaseRepo = CouchBaseRepo();
       yield ChatListenState();
+      couchBaseRepo.enableReplicas(
+          channels: ['sender_1'],
+          replicaChange: (event){
 
-      _listenerToken = replicator.addChangeListener((ReplicatorChange event) {
-        if (event.status.error != null) {
-        }
-      });
-
+          }, dbChange: (dbChange){
+            add(UpdateChatList(dbChange.documentIDs));
+          });
       // Create a query to fetch documents.
-      var query = QueryBuilder.select([SelectResult.all(), SelectResult.expression(Meta.id)])
-          .from(database_name);
-      // Run the query.
       try {
-        var result = await query.execute();
+        var result = await couchBaseRepo.fetchAllChats();
         idUserModel = await getAllChatUsers(result);
+        print("${chats.length}");
         for(var row in result.allResults()) {
-          chats.add(ChatModel.fromResult(row, idUserModel));
+          try {
+            chats.add(ChatModel.fromResult(row, idUserModel));
+          } catch(e){
+            print("Error: $e ${row.toMap()}");
+          }
         }
         yield ChatLoadedState(chats: chats);
       } on PlatformException {
       }
-
-      _dbListenerToken = database.addChangeListener((dbChange) {
-        add(UpdateChatList(dbChange.documentIDs));
-      });
-
-      replicator.start();
-
     } else if(event is UpdateChatList) {
       yield ChatChangeData();
       List<String> chatsIds = chats.map((x) => x.id).toList();
-      List<Document> docs = await Future.wait(event.changes.map((change) async => await database.document(change)));
+      List<Document> docs = await couchBaseRepo.getChangesDocs(event.changes);
       Map<String, UserModel> idUserModel = await getAllDocsUsers(docs);
 
       for (var change in event.changes) {
         if (!chatsIds.contains(change)) {
-          Document doc = await database.document(change);
+          Document doc = await couchBaseRepo.getDocument(change);
           ChatModel.fromDoc(doc, idUserModel);
         } else{
-          Document doc = await database.document(change);
+          Document doc = await couchBaseRepo.getDocument(change);
           for (var i=0; i<chats.length; i++){
             var chat = chats[i];
             if (chat.id == change) {
-              chats[i] = ChatModel.fromDoc(doc, idUserModel);
+              try {
+                chats[i] = ChatModel.fromDoc(doc, idUserModel);
+              } catch(e){
+                print("Error: $e ${doc.toMap()}");
+              }
             }
           }
         }
       }
       yield ChatLoadedState(chats: chats);
+    } else if (event is NewChatEvent) {
+      couchBaseRepo = CouchBaseRepo();
+      couchBaseRepo.createChat(event.receiver, event.owner);
     }
   }
 
 
   @override
   Future<void> close() async {
-    await replicator?.removeChangeListener(_listenerToken);
-    await replicator?.stop();
-    await replicator?.dispose();
-    await database?.removeChangeListener(_dbListenerToken);
-    await database?.close();
+    couchBaseRepo?.dispose();
     return super.close();
   }
 

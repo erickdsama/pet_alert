@@ -11,8 +11,8 @@ import 'package:pet_alert/pages/my_alerts.dart';
 import 'package:pet_alert/pages/my_pets.dart';
 import 'package:pet_alert/pages/new_pet.dart';
 import 'package:pet_alert/pages/pet_detail.dart';
+import 'package:pet_alert/repo/AlertRepo.dart';
 import 'package:pet_alert/repo/user_repo.dart';
-import 'package:pet_alert/services/AuthService.dart';
 
 import 'pages/login.dart';
 
@@ -21,9 +21,13 @@ UserRepo userRepo = UserRepo();
 
 class Routing{
   ChatBloc chatBloc = ChatBloc(userRepo);
+  AlertRepo alertRepo = AlertRepo();
+
+  void init() {
+
+  }
 
   Route<dynamic>generateRouting(settings) {
-
     final args = settings.arguments;
     switch(settings.name) {
       case '/listPets':
@@ -44,7 +48,7 @@ class Routing{
         break;
       case '/newPet':
         return CupertinoPageRoute(
-            builder: (_) => new NewPetPage(null)
+            builder: (_) => new NewPetPage()
         );
         break;
       case '/myPets':
@@ -98,9 +102,13 @@ class Routing{
         break;
       default:
         return CupertinoPageRoute(
-            builder: (_) => new LoginPage(authService: new AuthService())
+            builder: (_) => new LoginPage()
         );
     }
   }
+  @override
+  void dispose() {
+    chatBloc.close();
 
+  }
 }

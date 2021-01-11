@@ -2,17 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pet_alert/bloc/alert_bloc.dart';
-import 'package:pet_alert/bloc/message_bloc.dart';
-import 'package:pet_alert/bloc/pets/bloc.dart';
+import 'package:pet_alert/bloc/login/bloc.dart';
 import 'package:pet_alert/globals.dart';
 import 'package:pet_alert/pages/login.dart';
 import 'package:pet_alert/pages/main_page.dart';
-import 'package:pet_alert/repo/AlertRepo.dart';
-import 'package:pet_alert/repo/PetRepo.dart';
 import 'package:pet_alert/repo/location.dart';
+import 'package:pet_alert/repo/login_repo.dart';
+import 'package:pet_alert/repo/user_repo.dart';
 import 'package:pet_alert/routing.dart';
-import 'package:pet_alert/services/AuthService.dart';
 import 'package:pet_alert/utils.dart';
 
 import 'bloc/auth/auth_bloc.dart';
@@ -43,35 +40,41 @@ class SimpleBlocDelegate extends BlocDelegate {
 
 void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
-  var authService = AuthService();
-  AlertRepo alertRepo = AlertRepo();
-  PetRepo petRepo = PetRepo();
+  LoginRepo loginRepo = LoginRepo();
+  UserRepo userRepo = UserRepo();
   LocationRepo locationRepo = LocationRepo();
+  LoginBloc loginBloc = LoginBloc(loginRepo: loginRepo, userRepo: userRepo);
   LocationBloc locationBloc = LocationBloc(locationRepo);
   runApp(MultiBlocProvider(
     providers: [
-      BlocProvider<PetBloc>(
-        create: (context) => PetBloc(petRepo),
-      ),
       BlocProvider<LocationBloc>(
         create: (context) =>  locationBloc
       ),
-      BlocProvider<AlertBloc>(
-        create: (context) => AlertBloc(alertRepo, locationBloc),
+      BlocProvider<LoginBloc>.value(
+        value: loginBloc,
       ),
       BlocProvider<AuthBloc>(
-        create: (context) => AuthBloc()),
+        create: (context) => AuthBloc(loginBloc: loginBloc)),
     ],
-    child: Main(authService: authService,),
+    child: Main(),
   ));
 
 }
 
-class Main extends StatelessWidget {
+class Main extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _MainState();
+}
 
-  final AuthService authService;
-  Main({Key key, @required this.authService}) : super(key: key);
+
+class _MainState extends State<Main> {
   Routing routing = Routing();
+
+  @override
+  void initState() {
+    routing.init();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,24 +93,35 @@ class Main extends StatelessWidget {
         onGenerateRoute: routing.generateRouting,
         home: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state){
-              return FutureBuilder(
-                  future: getUser(),
-                  builder: (context, snapshot){
-                    if(snapshot.connectionState == ConnectionState.done) {
-                      User user = snapshot.data;
-                      if (user != null) {
-                        return MainPage(user: user,);
+              if (state is AuthenticatedState) {
+                return MainPage();
+              } else {
+                return FutureBuilder(
+                    future: getUser(),
+                    builder: (context, snapshot){
+                      if(snapshot.connectionState == ConnectionState.done) {
+                        User user = snapshot.data;
+                        if (user != null) {
+                          return MainPage();
+                        } else {
+                          return LoginPage();
+                        }
+                      } else if(snapshot.connectionState == ConnectionState.none) {
+                        return LoginPage();
                       } else {
-                        return LoginPage(authService: authService);
+                        return CircularProgressIndicator();
                       }
-                    } else if(snapshot.connectionState == ConnectionState.none) {
-                      return LoginPage(authService: authService);
-                    } else {
-                      return CircularProgressIndicator();
-                    }
-                }
-              );
+                  }
+                );
+              }
             }
         ));
+  }
+
+
+  @override
+  void dispose() {
+    routing.dispose();
+    super.dispose();
   }
 }

@@ -5,34 +5,43 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pet_alert/bloc/alert_bloc.dart';
 import 'package:pet_alert/bloc/alert_event.dart';
 import 'package:pet_alert/bloc/bloc.dart';
+import 'package:pet_alert/bloc/chat/chat_bloc.dart';
 import 'package:pet_alert/bloc/pets/bloc.dart';
 import 'package:pet_alert/models/AlertModel.dart';
 import 'package:pet_alert/models/PetModel.dart';
 import 'package:pet_alert/styles.dart';
 import 'package:pet_alert/utils.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   static const String id = 'ProfileScreen';
-  final User user;
 
-  ProfileScreen(
-      this.user
-      );
-
+  ProfileScreen();
 
   @override
-  Widget build(BuildContext context) {
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
 
-    // replicate();
-    BlocProvider.of<AlertBloc>(context).add(FetchMyAlerts());
-    BlocProvider.of<PetBloc>(context).listen((state) {
+class _ProfileScreenState extends State<ProfileScreen> {
+
+
+  // BloC
+  PetBloc petBloc;
+  AlertBloc alertBloc;
+  ChatBloc chatBloc;
+
+  @override
+  void initState() {
+    alertBloc = BlocProvider.of<AlertBloc>(context);
+    petBloc = BlocProvider.of<PetBloc>(context);
+
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
+    alertBloc.add(FetchMyAlerts());
+    petBloc.listen((state) {
       if(state is PetsInitialState) {
         BlocProvider.of<PetBloc>(context).add(FetchPets());
-      }
-    });
-    BlocProvider.of<AlertBloc>(context).listen((state) {
-      if(state is AlertInitialState) {
-        BlocProvider.of<AlertBloc>(context).add(FetchMyAlerts());
       }
     });
 
@@ -155,4 +164,5 @@ class ProfileScreen extends StatelessWidget {
           )
     );
   }
+
 }

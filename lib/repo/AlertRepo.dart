@@ -18,10 +18,12 @@ class AlertRepo{
 
   Future<List<AlertModel>> fetchNearbyAlertPets(String lat, String lon) async{
     var url = 'http://167.99.170.7:5000/alert/$lon/$lat/';
+    print("Url ${url}");
     final result = await http.get(url);
     if(result.statusCode != 200) {
       throw Exception("djnskjndjknkjsn");
     }else {
+      print("result ${parsedJSON(result)}");
       return parsedJSON(result);
     }
 

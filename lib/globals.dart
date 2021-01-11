@@ -9,4 +9,5 @@ const greyLight = Color(0xFFFAFAFA);
 
 const API_URL = "http://";
 
-const database_name = "pet_alert_9329393223";
+const database_name = "sdadsdasdsadsadasdsadsadasdsadsadsdsaadas";
+const URL_WS = "ws://138.68.249.12:4984/pet_alert/";

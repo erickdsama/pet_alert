@@ -8,6 +8,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:pet_alert/bloc/chat/chat_bloc.dart';
 import 'package:pet_alert/bloc/message_bloc.dart';
 import 'package:pet_alert/models/ChatModel.dart';
+import 'package:pet_alert/models/MessageModel.dart';
 import 'package:pet_alert/repo/user_repo.dart';
 import 'package:pet_alert/widgets/list_messages_item.dart';
 
@@ -19,6 +20,7 @@ class Chat extends StatelessWidget {
   UserRepo userRepo;
   ChatModel chatModel;
   MessageBloc messageBloc;
+  List<MessageModel> messages = [];
   Widget notChats(context){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -77,37 +79,33 @@ class Chat extends StatelessWidget {
                       builder: (context, state){
                         if (state is MessageInitial) {
                           BlocProvider.of<MessageBloc>(context).add(ListenerMessages(docId: chatModel.id));
+                        } else if (state is NewMessages) {
+                          messages = state.messages;
                         }
-                        if(state is NewMessages) {
-                          Timer(
-                              Duration(milliseconds: 300),
-                                  () => _scrollController
-                                  .jumpTo(_scrollController.position.maxScrollExtent));
-                            if (state.messages.length > -1) {
-                            return Flexible(
-                              child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: state.messages.length,
-                                  controller: _scrollController,
-                                  itemBuilder: (BuildContext ctx, int idx) {
-                                    return Dismissible(
-                                        movementDuration: Duration(seconds: 2),
-                                        dragStartBehavior: DragStartBehavior.down,
-                                        background: Container(color: Colors.redAccent,),
-                                        direction: DismissDirection.endToStart,
-                                        key: Key(state.messages[idx].id),
-                                        onDismissed: (direction) {
-                                        },
-                                        child: ListMessageItem(messageModel: state.messages[idx])
-                                    );
-                                  }),
-                            );
-                          } else {
-                            return notChats(context);
-                          }
-                        } else {
+                        if (messages.length <= 0) {
                           return notChats(context);
                         }
+                        Timer(
+                            Duration(milliseconds: 300),
+                                () => _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: Duration(milliseconds: 200), curve: Curves.easeInExpo));
+                        return Flexible(
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: messages.length,
+                              controller: _scrollController,
+                              itemBuilder: (BuildContext ctx, int idx) {
+                                return Dismissible(
+                                    movementDuration: Duration(seconds: 2),
+                                    dragStartBehavior: DragStartBehavior.down,
+                                    background: Container(color: Colors.redAccent,),
+                                    direction: DismissDirection.endToStart,
+                                    key: Key(messages[idx].id),
+                                    onDismissed: (direction) {
+                                    },
+                                    child: ListMessageItem(messageModel: messages[idx])
+                                );
+                              }),
+                        );
                       }),
                     Row(
                       children: [

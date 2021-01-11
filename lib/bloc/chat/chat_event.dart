@@ -17,3 +17,13 @@ class UpdateChatList extends ChatEvent {
 class InitialChatEvent extends ChatEvent {
   InitialChatEvent();
 }
+
+class NewChatEvent extends ChatEvent {
+  final UserModel owner;
+  final UserModel receiver;
+  final String message;
+
+  NewChatEvent(this.owner, this.receiver, this.message);
+
+  List<Object> get props => [owner, receiver, message];
+}

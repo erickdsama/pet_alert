@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:couchbase_lite/couchbase_lite.dart';
 import 'package:http/http.dart' as http;
 import 'package:pet_alert/models/AlertModel.dart';
 import 'package:pet_alert/models/UserModel.dart';
+
+import '../utils.dart';
 
 class UserRepo{
 
@@ -29,14 +32,12 @@ class UserRepo{
       "Content-Type":"application/json"
     };
     final result = await http.post(url, body: data.toJSON(), headers: headers);
-    print("res  ${result.body}");
     if(result.statusCode != 200) {
       throw Exception("Error posting user");
     }else {
       return UserModel.fromJSON(jsonDecode(result.body));
     }
   }
-
 
   Future<UserModel> getMe() async{
     var url = 'http://167.99.170.7:5000/me';

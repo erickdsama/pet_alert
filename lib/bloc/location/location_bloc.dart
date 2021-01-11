@@ -18,8 +18,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     if (event is FetchLocationEvent) {
       try {
         yield LocationIsFetchingState();
-
         Position position = await locationRepo.getLocation();
+        print("position ${position.longitude} ");
+
         if (position != null) {
           yield LocationIsFetchedState(position: position);
         } else {

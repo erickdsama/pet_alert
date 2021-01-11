@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:pet_alert/bloc/location/bloc.dart';
 import 'package:pet_alert/models/AlertModel.dart';
 import 'package:pet_alert/repo/AlertRepo.dart';
@@ -9,17 +10,20 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
   final LocationBloc locationBloc;
   StreamSubscription locationBlocSuscription;
   AlertRepo alertRepo;
-  AlertBloc(this.alertRepo, this.locationBloc){
-    locationBlocSuscription = this.locationBloc.listen((state) {
-      if (state is LocationIsFetchedState) {
-        add(FetchAlerts(lat: state.position.latitude.toString(), lon: state.position.longitude.toString()));
-      }
-    });
+  AlertBloc({@required this.alertRepo, this.locationBloc}){
+    if (locationBloc != null) {
+      locationBlocSuscription = this.locationBloc.listen((state) {
+        if (state is LocationIsFetchedState) {
+          print("si estoy escuchando????");
+          add(FetchAlerts(lat: state.position.latitude.toString(), lon: state.position.longitude.toString()));
+        }
+      });
+    }
   }
 
   @override
   Future<void> close() {
-    locationBlocSuscription.cancel();
+    locationBlocSuscription?.cancel();
     return super.close();
   }
 

@@ -5,6 +5,7 @@ import 'package:couchbase_lite/couchbase_lite.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pet_alert/models/MessageModel.dart';
 import 'package:pet_alert/models/UserModel.dart';
+import 'package:crossplat_objectid/crossplat_objectid.dart';
 
 import '../utils.dart';
 
@@ -28,6 +29,12 @@ class ChatModel{
     this.lastUpdate
   });
 
+  MutableDocument toDocument(){
+    return MutableDocument(
+        id: this.id != null?this.id:ObjectId().toHexString(),
+      data: this.toMap()
+    );
+  }
 
   static List<MessageModel> setMessages(List<dynamic> chatList, Map<String, UserModel> usersModels) {
     List<MessageModel> messages = [];
@@ -43,6 +50,8 @@ class ChatModel{
     }
     return messages;
   }
+
+
 
   factory ChatModel.fromResult(Result result, Map<String, UserModel> usersModels) {
     final chatList = getResultData(result, "chat");
@@ -81,6 +90,16 @@ class ChatModel{
         messages: messages,
         id: mapJson['id'].toString());
   }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'sender': this.owner.id,
+      'receiver': this.receiver.id,
+      'timestamp': int.parse(this.lastUpdate),
+      'chat': [],
+    };
+  }
+
 
   String toJSON() {
     return jsonEncode(<String, dynamic>{

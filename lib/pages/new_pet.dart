@@ -11,12 +11,7 @@ import 'package:pet_alert/pages/forms/newPetForm.dart';
 import 'package:pet_alert/styles.dart';
 
 class NewPetPage extends StatelessWidget {
-
-  final User user;
-  NewPetPage(
-      this.user
-      );
-
+  NewPetPage();
 
   @override
   Widget build(BuildContext context) {
