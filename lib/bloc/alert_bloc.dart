@@ -15,6 +15,11 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
       locationBlocSuscription = this.locationBloc.listen((state) {
         if (state is LocationIsFetchedState) {
           print("si estoy escuchando????");
+          print("si estoy escuchando????");
+          print("si estoy escuchando????");
+          print("si estoy escuchando????");
+
+
           add(FetchAlerts(lat: state.position.latitude.toString(), lon: state.position.longitude.toString()));
         }
       });
@@ -32,6 +37,8 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
 
   @override
   Stream<AlertState> mapEventToState(AlertEvent event) async* {
+    print("SADAJSLDJASLDJSALDJASJLDALSJDLASJDASJDLSAJDLASJLDJASLDJSALDJASL");
+
     if (event is FetchAlerts) {
       try {
         yield AlertLoadingState();

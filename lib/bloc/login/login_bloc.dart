@@ -22,6 +22,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (event is LoginGoogle) {
       LoginLoading();
       User gUser = await getUser();
+      print("gUser $gUser");
       if (gUser == null) {
         gUser = await loginRepo.signInWithGoogle();
       }

@@ -42,21 +42,26 @@ class _ListScreenState extends State<ListScreen> {
 
   @override
   void initState() {
+    print("INIIIIIIIIIIIIIIIIITTTTTT");
     alertBloc = BlocProvider.of<AlertBloc>(context);
     locationBloc = BlocProvider.of<LocationBloc>(context);
-    locationBloc.listen((state) {
-      if (state is LocationInitialState) {
-        print("fetching.,,,,");
-        locationBloc.add(FetchLocationEvent());
-      }
-    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    locationBloc.listen((state) {
+      if (state is LocationInitialState) {
+        locationBloc.add(FetchLocationEvent());
+      } else if (state is LocationIsFetchedState) {
 
+//        alertBloc.add(FetchAlerts(lat: state.position.latitude.toString(), lon: state.position.longitude.toString()));
 
+      } else if(state is LocationErrorState ) {
+        print("error");
+//        locationBloc.add(FetchLocationEvent());
+      }
+    });
     return CupertinoPageScaffold(
       backgroundColor: Colors.white,
       navigationBar: CupertinoNavigationBar(
@@ -65,10 +70,11 @@ class _ListScreenState extends State<ListScreen> {
       ),
       child: GestureDetector(
         child: BlocBuilder<AlertBloc, AlertState>(
-          bloc:  BlocProvider.of<AlertBloc>(context),
+          bloc:  alertBloc,
           builder: (context, state){
+            print("ldsajaksjdlkajdkajskldsjklasjkdasjdkljkdsajkldsajkldsjkdlasjladskjdsalkjdas $state}");
             if (state is AlertInitialState) {
-              return notAlerts();
+              return CircularProgressIndicator();
             } else if(state is AlertLoadingState) {
               return CircularProgressIndicator();
             } else if( state is AlertIsLoadedState){
@@ -81,8 +87,9 @@ class _ListScreenState extends State<ListScreen> {
               } else {
                 return notAlerts();
               }
+            } else {
+              return Container();
             }
-            return notAlerts();
           },
         )
         ),
@@ -91,6 +98,7 @@ class _ListScreenState extends State<ListScreen> {
 
   @override
   void dispose() {
+    print("dispose");
     alertBloc?.close();
     super.dispose();
   }

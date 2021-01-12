@@ -64,21 +64,28 @@ void main() {
 class Main extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _MainState();
+
 }
 
 
 class _MainState extends State<Main> {
   Routing routing = Routing();
+  MainTabPage mainTabPage = MainTabPage();
+  LoginPage loginPage = LoginPage();
 
   @override
   void initState() {
     routing.init();
     super.initState();
+    print("ESTE SOLO ES UNO");
+
   }
 
   @override
   Widget build(BuildContext context) {
+    print("entro de nuevo");
     return new CupertinoApp(
+
         localizationsDelegates: [
           DefaultMaterialLocalizations.delegate,
           DefaultCupertinoLocalizations.delegate,
@@ -93,26 +100,30 @@ class _MainState extends State<Main> {
         onGenerateRoute: routing.generateRouting,
         home: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state){
+              print("chance es esto");
               if (state is AuthenticatedState) {
-                return MainPage();
-              } else {
+                return mainTabPage;
+              } else if(state is InitialAuthState) {
                 return FutureBuilder(
                     future: getUser(),
                     builder: (context, snapshot){
                       if(snapshot.connectionState == ConnectionState.done) {
                         User user = snapshot.data;
                         if (user != null) {
-                          return MainPage();
+                          return mainTabPage;
                         } else {
-                          return LoginPage();
+                          return loginPage;
                         }
                       } else if(snapshot.connectionState == ConnectionState.none) {
-                        return LoginPage();
+                        return loginPage;
                       } else {
                         return CircularProgressIndicator();
                       }
                   }
                 );
+              } else {
+                print("state >>> $state");
+                return LoginPage();
               }
             }
         ));
@@ -121,6 +132,7 @@ class _MainState extends State<Main> {
 
   @override
   void dispose() {
+    print("dispose");
     routing.dispose();
     super.dispose();
   }

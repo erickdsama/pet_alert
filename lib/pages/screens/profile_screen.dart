@@ -165,4 +165,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  @override
+  void dispose() {
+    alertBloc?.close();
+    petBloc?.close();
+    chatBloc?.close();
+    super.dispose();
+  }
+
 }

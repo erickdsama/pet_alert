@@ -30,11 +30,6 @@ class Routing{
   Route<dynamic>generateRouting(settings) {
     final args = settings.arguments;
     switch(settings.name) {
-      case '/listPets':
-        return CupertinoPageRoute(
-            builder: (_) => new MainPage()
-        );
-        break;
       case '/petDetail':
         AlertModel alertModel;
         if (args is Map) {

@@ -18,77 +18,85 @@ LocationRepo locationRepo = LocationRepo();
 LocationBloc locationBloc = LocationBloc(locationRepo);
 
 
-class MainPage extends StatefulWidget {
-  @override
-  _MainPageState createState() => _MainPageState();
-}
+//class MainPage extends StatefulWidget {
+//  @override
+//  _MainPageState createState() => _MainPageState();
+//}
 
-class _MainPageState extends State<MainPage> {
+class MainTabPage extends StatelessWidget {
 
   // BloC
   PetBloc petBloc;
   AlertBloc alertBloc;
+  AlertBloc myAlertsBloc;
   ChatBloc chatBloc;
 
   //repos
   PetRepo petRepo = PetRepo();
   AlertRepo alertRepo = AlertRepo();
   UserRepo userRepo = UserRepo();
+  CupertinoTabScaffold mainTabScaffold;
 
-  @override
-  void initState() {
-    petBloc = PetBloc(petRepo);
-    locationBloc = BlocProvider.of<LocationBloc>(context);
-    alertBloc = AlertBloc(alertRepo: alertRepo);
-    chatBloc = ChatBloc(userRepo);
-    super.initState();
-  }
+  ListScreen listScreen = ListScreen();
+  ProfileScreen profileScreen = ProfileScreen();
 
+
+  int currentScreen = 0;
+  CupertinoTabController _tabController = CupertinoTabController(
+    initialIndex: 0
+  );
   @override
   Widget build(BuildContext context) {
-    return new CupertinoTabScaffold(
+    print("cuantas veces entro");
+    return CupertinoTabScaffold(
+      controller: _tabController,
       tabBuilder: (BuildContext context, int index) {
+        print("when is callllllllll $index");
         if(index == 0) {
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider<AlertBloc>(
-                  create: (context) => AlertBloc(alertRepo: alertRepo, locationBloc: locationBloc)
-              ),
-            ],
-            child: ListScreen()
+          print("HEEEERRREEEEEE");
+          Widget blocProvider =  MultiBlocProvider(
+              providers: [
+                BlocProvider<AlertBloc>.value(value: alertBloc,)
+              ],
+              child: listScreen
           );
+          return blocProvider;
         } else if(index == 1) {
           return MultiBlocProvider(
-            providers: [
-              BlocProvider<PetBloc>.value(value: petBloc),
-            ],
-            child:  NewPetPage()
+              providers: [
+                BlocProvider<PetBloc>.value(value: petBloc),
+              ],
+              child:  NewPetPage()
           );
         } else if(index == 2) {
           return MultiBlocProvider(
               providers: [
                 BlocProvider<PetBloc>.value(value: petBloc),
-                BlocProvider<AlertBloc>.value(value: alertBloc),
+                BlocProvider<AlertBloc>.value(value: myAlertsBloc),
                 BlocProvider<ChatBloc>.value(value: chatBloc)
-              ], child: ProfileScreen()
+              ], child: profileScreen
+          );
+        } else {
+          return  MultiBlocProvider(
+              providers: [
+                BlocProvider<AlertBloc>.value(value: alertBloc,)
+              ],
+              child: listScreen
           );
         }
-        return ListScreen();
       },
       tabBar: new CupertinoTabBar(
           items: [
             BottomNavigationBarItem(icon: Icon(CupertinoIcons.paw_solid), label: "Mascotas"),
             BottomNavigationBarItem(icon: Icon(CupertinoIcons.add_circled_solid), label: "Agregar"),
             BottomNavigationBarItem(icon: Icon(CupertinoIcons.person_alt_circle), label: "Profile"),
-    ]),
+          ]),
     );
   }
 
-  @override
-  void dispose() {
-    petBloc?.close();
-    alertBloc?.close();
-    chatBloc?.close();
-    super.dispose();
+
+  CupertinoTabScaffold buildScaffold() {
+
   }
+
 }
