@@ -66,7 +66,7 @@ class PetDetailPage extends StatelessWidget{
               Container(
                 child: Padding(
                   padding: EdgeInsets.all(0),
-                  child: Image.network(alertModel.pet["photo"], fit: BoxFit.fitWidth, height: 300, ),
+                  child: Image.network(alertModel.pet.photo, fit: BoxFit.fitWidth, height: 300, ),
                 ),
                 width: double.infinity,
               ),
@@ -78,7 +78,7 @@ class PetDetailPage extends StatelessWidget{
                     children: [
                       Row(
                         children: [
-                          Text("${alertModel.pet["name"]}", style: title,)
+                          Text("${alertModel.pet.name}", style: title,)
                         ],
                       ),
                       Row(
@@ -96,7 +96,7 @@ class PetDetailPage extends StatelessWidget{
                                 height: 50,
                                 child: ClipRRect(
                                     borderRadius: BorderRadius.circular(50.0),
-                                    child: Image.network('${alertModel.pet["photo"]}', height: 50, width: 50, fit: BoxFit.fill )
+                                    child: Image.network('${alertModel.pet.photo}', height: 50, width: 50, fit: BoxFit.fill )
                                 )
                             )
                           )
@@ -127,7 +127,7 @@ class PetDetailPage extends StatelessWidget{
                                   children: [
                                     Icon(Ionicons.ios_color_palette),
                                     Text(""),
-                                    Text("${alertModel.pet['color']}", textAlign: TextAlign.center, style: subText,)
+                                    Text("${alertModel.pet.color}", textAlign: TextAlign.center, style: subText,)
                                   ]
                               )
                             )
@@ -140,7 +140,7 @@ class PetDetailPage extends StatelessWidget{
                                   children: [
                                     Icon(FontAwesome5Solid.dna),
                                     Text(""),
-                                    Text("${alertModel.pet['breed']}", textAlign: TextAlign.center, style: subText,)
+                                    Text("${alertModel.pet.breed}", textAlign: TextAlign.center, style: subText,)
                                   ]
                               )
                             )
@@ -170,7 +170,7 @@ class PetDetailPage extends StatelessWidget{
                                     Row(
                                       children: [
                                         Expanded(
-                                            child: Text("Sobre ${alertModel.pet["name"]}", style: secondTitle,)
+                                            child: Text("Sobre ${alertModel.pet.name}", style: secondTitle,)
                                         ),
                                       ],
                                     ),

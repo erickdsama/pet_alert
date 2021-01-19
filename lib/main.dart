@@ -62,6 +62,8 @@ void main() {
 }
 
 class Main extends StatefulWidget {
+
+
   @override
   State<StatefulWidget> createState() => _MainState();
 
@@ -75,17 +77,15 @@ class _MainState extends State<Main> {
 
   @override
   void initState() {
-    routing.init();
+    print("calllllll twice");
+    // TODO: implement
     super.initState();
-    print("ESTE SOLO ES UNO");
-
   }
 
   @override
   Widget build(BuildContext context) {
     print("entro de nuevo");
     return new CupertinoApp(
-
         localizationsDelegates: [
           DefaultMaterialLocalizations.delegate,
           DefaultCupertinoLocalizations.delegate,
@@ -100,27 +100,11 @@ class _MainState extends State<Main> {
         onGenerateRoute: routing.generateRouting,
         home: BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state){
-              print("chance es esto");
+              print("chance es esto $state");
               if (state is AuthenticatedState) {
                 return mainTabPage;
               } else if(state is InitialAuthState) {
-                return FutureBuilder(
-                    future: getUser(),
-                    builder: (context, snapshot){
-                      if(snapshot.connectionState == ConnectionState.done) {
-                        User user = snapshot.data;
-                        if (user != null) {
-                          return mainTabPage;
-                        } else {
-                          return loginPage;
-                        }
-                      } else if(snapshot.connectionState == ConnectionState.none) {
-                        return loginPage;
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                  }
-                );
+                return LoginPage();
               } else {
                 print("state >>> $state");
                 return LoginPage();
@@ -129,11 +113,11 @@ class _MainState extends State<Main> {
         ));
   }
 
-
-  @override
-  void dispose() {
-    print("dispose");
-    routing.dispose();
-    super.dispose();
-  }
+  //
+  // @override
+  // void dispose() {
+  //   print("dispose");
+  //   routing.dispose();
+  //   super.dispose();
+  // }
 }

@@ -92,11 +92,13 @@ class ChatModel{
   }
 
   Map<String, dynamic> toMap() {
+    print("receiver -> ${this.receiver}");
+    print("sender -> ${this.owner}");
     return <String, dynamic>{
       'sender': this.owner.id,
       'receiver': this.receiver.id,
       'timestamp': int.parse(this.lastUpdate),
-      'chat': [],
+      'chat': this.messages.map((message) => message.toMap()).toList(),
     };
   }
 

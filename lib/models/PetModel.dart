@@ -1,6 +1,8 @@
 
 import 'dart:convert';
 
+import 'package:pet_alert/models/UserModel.dart';
+
 class PetModel{
   String name;
   String photo;
@@ -11,6 +13,7 @@ class PetModel{
   String disease;
   String medicates;
   double weight;
+  UserModel owner;
   double age;
   int sex;
 
@@ -24,12 +27,14 @@ class PetModel{
     this.size,
     this.disease,
     this.medicates,
+    this.owner,
     this.age,
     this.sex});
 
 
   factory PetModel.fromJSON(Map<String, dynamic> json) {
     return PetModel(
+        owner: UserModel.fromJSON(json["owner"]),
         name: json['name'],
         photo: json['photo'],
         breed: json['breed'],

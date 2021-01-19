@@ -23,6 +23,8 @@ class UserModel{
   factory UserModel.fromJSON(Map<String, dynamic> json) {
     return UserModel(
         name: json['name'],
+        gUser: json['g_user'],
+        email: json['email'],
         photo: json['photo'],
         age: json['age'],
         sex: json['sex'],
@@ -38,6 +40,17 @@ class UserModel{
       // 'age': this.age, todo fix api problem
 //      'sex': this.sex,
     });
+  }
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'name': this.name,
+      'photo': this.photo,
+      'email': this.email,
+      'g_user': this.gUser,
+      'id': this.id,
+      // 'age': this.age, todo fix api problem
+//      'sex': this.sex,
+    };
   }
 
 }

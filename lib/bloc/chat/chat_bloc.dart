@@ -78,10 +78,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       couchBaseRepo = CouchBaseRepo();
       yield ChatListenState();
       couchBaseRepo.enableReplicas(
-          channels: ['sender_1'],
+          channels: ['sender_'+event.loggedUser.id.toString()],
           replicaChange: (event){
+            print("event $event");
 
           }, dbChange: (dbChange){
+            print("el bueno db ${dbChange.documentIDs}");
             add(UpdateChatList(dbChange.documentIDs));
           });
       // Create a query to fetch documents.
@@ -93,10 +95,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           try {
             chats.add(ChatModel.fromResult(row, idUserModel));
           } catch(e){
-            print("Error: $e ${row.toMap()}");
+            print("EEEEERRRRRRROOOOOOORRRR: $e ${row.toMap()}");
           }
         }
-        yield ChatLoadedState(chats: chats);
+
+        yield ChatLoadedState(chats: orderChats(chats));
       } on PlatformException {
       }
     } else if(event is UpdateChatList) {
@@ -108,7 +111,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       for (var change in event.changes) {
         if (!chatsIds.contains(change)) {
           Document doc = await couchBaseRepo.getDocument(change);
-          ChatModel.fromDoc(doc, idUserModel);
+
+          chats.add(ChatModel.fromDoc(doc, idUserModel));
         } else{
           Document doc = await couchBaseRepo.getDocument(change);
           for (var i=0; i<chats.length; i++){
@@ -117,16 +121,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
               try {
                 chats[i] = ChatModel.fromDoc(doc, idUserModel);
               } catch(e){
-                print("Error: $e ${doc.toMap()}");
+                print("EEEEERRRRRRROOOOOOORRRRsadsadsa: $e ${doc.toMap()}");
               }
             }
           }
         }
       }
-      yield ChatLoadedState(chats: chats);
+      yield ChatLoadedState(chats: orderChats(chats));
     } else if (event is NewChatEvent) {
       couchBaseRepo = CouchBaseRepo();
-      couchBaseRepo.createChat(event.receiver, event.owner);
+      couchBaseRepo.createChat(event.receiver, event.owner, event.message);
     }
   }
 

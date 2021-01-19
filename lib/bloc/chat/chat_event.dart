@@ -15,7 +15,9 @@ class UpdateChatList extends ChatEvent {
 }
 
 class InitialChatEvent extends ChatEvent {
-  InitialChatEvent();
+  final UserModel loggedUser;
+  InitialChatEvent(this.loggedUser);
+  List<Object> get props => [loggedUser];
 }
 
 class NewChatEvent extends ChatEvent {

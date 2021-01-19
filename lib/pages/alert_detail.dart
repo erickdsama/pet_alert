@@ -6,8 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pet_alert/bloc/auth/auth_bloc.dart';
+import 'package:pet_alert/bloc/auth/auth_state.dart';
 import 'package:pet_alert/bloc/login/bloc.dart';
 import 'package:pet_alert/models/AlertModel.dart';
+import 'package:pet_alert/models/UserModel.dart';
 import 'package:pet_alert/pages/forms/direct_message.dart';
 import 'package:pet_alert/services/AuthService.dart';
 import 'package:pet_alert/styles.dart';
@@ -22,6 +25,8 @@ import 'forms/loginForm.dart';
 class AlertDetailPage extends StatelessWidget{
   final AlertModel alertModel;
   final List<LatLng> latlng = [];
+  UserModel loginUserModel;
+
 
   Set<Polygon> _polygons = Set<Polygon>();
   AlertDetailPage({Key key, this.alertModel}) : super(key: key);
@@ -77,7 +82,7 @@ class AlertDetailPage extends StatelessWidget{
               Container(
                 child: Padding(
                   padding: EdgeInsets.all(0),
-                  child: Image.network(alertModel.pet["photo"], fit: BoxFit.fitWidth, height: 300, ),
+                  child: Image.network(alertModel.pet.photo, fit: BoxFit.fitWidth, height: 300, ),
                 ),
                 width: double.infinity,
               ),
@@ -89,14 +94,14 @@ class AlertDetailPage extends StatelessWidget{
                     children: [
                       Row(
                         children: [
-                          Text("${alertModel.pet["name"]}", style: title,)
+                          Text("${alertModel.pet.name}", style: title,)
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
                             flex: 3,
-                            child: Text("Reportado por: \nErick Samaniego"),
+                            child: Text("Reportado por: ${alertModel.pet.owner.name}"),
                           ),
                           Expanded(
                             flex: 1,
@@ -107,7 +112,7 @@ class AlertDetailPage extends StatelessWidget{
                                 height: 50,
                                 child: ClipRRect(
                                     borderRadius: BorderRadius.circular(50.0),
-                                    child: Image.network('${alertModel.pet["photo"]}', height: 50, width: 50, fit: BoxFit.fill )
+                                    child: Image.network('${alertModel.pet.photo}', height: 50, width: 50, fit: BoxFit.fill )
                                 )
                             )
                           )
@@ -138,7 +143,7 @@ class AlertDetailPage extends StatelessWidget{
                                   children: [
                                     Icon(Ionicons.ios_color_palette),
                                     Text(""),
-                                    Text("${alertModel.pet['color']}", textAlign: TextAlign.center, style: subText,)
+                                    Text("${alertModel.pet.color}", textAlign: TextAlign.center, style: subText,)
                                   ]
                               )
                             )
@@ -151,7 +156,7 @@ class AlertDetailPage extends StatelessWidget{
                                   children: [
                                     Icon(FontAwesome5Solid.dna),
                                     Text(""),
-                                    Text("${alertModel.pet['breed']}", textAlign: TextAlign.center, style: subText,)
+                                    Text("${alertModel.pet.breed}", textAlign: TextAlign.center, style: subText,)
                                   ]
                               )
                             )
@@ -179,14 +184,14 @@ class AlertDetailPage extends StatelessWidget{
                                   children: [
                                     ExpansionTile(
                                       initiallyExpanded: false,
-                                      title: Text("Más sobre ${alertModel.pet['name']}:", style: labels,),
+                                      title: Text("Más sobre ${alertModel.pet.name}:", style: labels,),
                                       children: [
-                                        listIconDetail(FontAwesome5Solid.dna, "Raza", alertModel.pet["breed"]),
-                                        listIconDetail(MaterialCommunityIcons.human_male_height, "Tamaño", alertModel.pet["size"]),
-                                        listIconDetail(Ionicons.ios_color_palette, "Color", alertModel.pet["color"]),
-                                        listIconDetail(FontAwesome.venus_mars, "Sex", alertModel.pet["sex"] == 1 ? "Hembra" : "Macho" ),
-                                        listIconDetail(Icons.warning, "Problemas", alertModel.pet["disease"] == null ? "N/A" : alertModel.pet["disease"]),
-                                        listIconDetail(Icons.medical_services, "Medicinas", alertModel.pet["disease"] == null ? "N/A" : alertModel.pet["disease"]),
+                                        listIconDetail(FontAwesome5Solid.dna, "Raza", alertModel.pet.breed),
+                                        listIconDetail(MaterialCommunityIcons.human_male_height, "Tamaño", alertModel.pet.size),
+                                        listIconDetail(Ionicons.ios_color_palette, "Color", alertModel.pet.color),
+                                        listIconDetail(FontAwesome.venus_mars, "Sex", alertModel.pet.sex == 1 ? "Hembra" : "Macho" ),
+                                        listIconDetail(Icons.warning, "Problemas", alertModel.pet.disease == null ? "N/A" : alertModel.pet.disease),
+                                        listIconDetail(Icons.medical_services, "Medicinas", alertModel.pet.medicates == null ? "N/A" : alertModel.pet.medicates),
                                       ],
                                     ),
                                     Text(""),
@@ -194,7 +199,21 @@ class AlertDetailPage extends StatelessWidget{
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
                                         children: [
-                                          Expanded(child: DirectMessageForm())
+                                          Expanded(
+                                              child: BlocBuilder<AuthBloc, AuthState>(
+                                                  bloc: BlocProvider.of<AuthBloc>(context),
+                                                  builder: (context, state) {
+                                                    if (state is AuthenticatedState) {
+                                                      print("state ${state.userModel}");
+                                                      return DirectMessageForm(
+                                                        loginUser: state.userModel,
+                                                        reportAlertUser: alertModel.pet.owner,
+                                                      );
+                                                    } else {
+                                                      return Container();
+                                                    }
+                                                  })
+                                          )
                                         ],
                                       ),
                                     )

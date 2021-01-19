@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "974543061721-n4vnas421r1a6j2untoo99m06ruu7qdg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.kulu.pet_alert",
+            "certificate_hash": "ba310ae8b0655d4a2df764296e3b31102ff6cc21"
+          }
+        },
+        {
+          "client_id": "974543061721-t7n729jj9inpfobm207b29bjctp2ptkm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.kulu.pet_alert",
+            "certificate_hash": "332aeb8d537317e80c086fe3f4c4a19dd3018bd0"
+          }
+        },
+        {
           "client_id": "974543061721-tt7nd5r2on92kdgodmm2pvmlns6603e9.apps.googleusercontent.com",
           "client_type": 3
         }

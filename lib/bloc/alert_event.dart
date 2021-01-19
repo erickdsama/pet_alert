@@ -8,6 +8,10 @@ abstract class AlertEvent extends Equatable{
   List<Object> get props => [];
 
 }
+class AlertFetchingLocation extends AlertEvent {
+  @override
+  List<Object> get props => [];
+}
 
 class FetchAlerts extends AlertEvent {
   final String lat;

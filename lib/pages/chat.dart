@@ -5,22 +5,36 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:pet_alert/bloc/auth/auth_bloc.dart';
+import 'package:pet_alert/bloc/auth/auth_state.dart';
 import 'package:pet_alert/bloc/chat/chat_bloc.dart';
 import 'package:pet_alert/bloc/message_bloc.dart';
 import 'package:pet_alert/models/ChatModel.dart';
 import 'package:pet_alert/models/MessageModel.dart';
+import 'package:pet_alert/repo/couchbase_repo.dart';
 import 'package:pet_alert/repo/user_repo.dart';
 import 'package:pet_alert/widgets/list_messages_item.dart';
 
 import '../styles.dart';
 
+class Chat extends StatefulWidget {
 
-class Chat extends StatelessWidget {
+  final ChatModel chatModel;
+  Chat({this.chatModel});
 
+  @override
+  _ChatState createState() => _ChatState(chatModel: chatModel);
+}
+
+class _ChatState extends State<Chat> {
   UserRepo userRepo;
-  ChatModel chatModel;
+  CouchBaseRepo couchBaseRepo = CouchBaseRepo();
   MessageBloc messageBloc;
   List<MessageModel> messages = [];
+  final ChatModel chatModel;
+
+  _ChatState({this.chatModel});
+
   Widget notChats(context){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -55,20 +69,18 @@ class Chat extends StatelessWidget {
     );
   }
 
-  Chat({this.chatModel});
-
   TextEditingController _messageController = TextEditingController();
   ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    messageBloc = MessageBloc(chatModel, BlocProvider.of<ChatBloc>(context));
+    messageBloc = MessageBloc(widget.chatModel, BlocProvider.of<ChatBloc>(context), couchBaseRepo);
     return BlocProvider<MessageBloc>.value(
       value: messageBloc,
       child: new CupertinoPageScaffold(
           backgroundColor: Colors.white,
           navigationBar: CupertinoNavigationBar(
-            middle: Text(chatModel.receiver.name),
+            middle: Text(widget.chatModel.receiver.name),
           ),
           child: Stack(
             children: [
@@ -78,7 +90,7 @@ class Chat extends StatelessWidget {
                   BlocBuilder<MessageBloc, MessageState>(
                       builder: (context, state){
                         if (state is MessageInitial) {
-                          BlocProvider.of<MessageBloc>(context).add(ListenerMessages(docId: chatModel.id));
+                          BlocProvider.of<MessageBloc>(context).add(ListenerMessages(docId: widget.chatModel.id));
                         } else if (state is NewMessages) {
                           messages = state.messages;
                         }
@@ -92,6 +104,7 @@ class Chat extends StatelessWidget {
                           child: ListView.builder(
                               shrinkWrap: true,
                               itemCount: messages.length,
+
                               controller: _scrollController,
                               itemBuilder: (BuildContext ctx, int idx) {
                                 return Dismissible(
@@ -119,12 +132,26 @@ class Chat extends StatelessWidget {
                         ),
                         Expanded(
                           flex: 2,
-                          child: CupertinoButton(
-                            child: Text("Enviar"),
-                            onPressed: () {
-                              messageBloc.add(SendMessage(message: _messageController.text));
-                              _messageController.clear();
-                            },
+                          child: BlocBuilder<AuthBloc, AuthState>(
+                            bloc: BlocProvider.of<AuthBloc>(context),
+                            builder: (context, state) {
+                              if (state is AuthenticatedState) {
+                                return CupertinoButton(
+                                  child: Text("Enviar"),
+                                  onPressed: () {
+                                    messageBloc.add(
+                                        SendMessage(
+                                            message: _messageController.text,
+                                            sender: state.userModel,
+                                            receiver: chatModel.owner.id == state.userModel.id ? chatModel.receiver : chatModel.owner ));
+                                    _messageController.clear();
+                                  },
+                                );
+                              } else {
+                                return Container();
+                              }
+
+                            }
                           ),
                         )
                       ],
@@ -135,5 +162,11 @@ class Chat extends StatelessWidget {
           )
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    couchBaseRepo.dispose();
+    super.dispose();
   }
 }

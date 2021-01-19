@@ -3,7 +3,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:pet_alert/bloc/auth/auth_bloc.dart';
+import 'package:pet_alert/bloc/auth/auth_state.dart';
 import 'package:pet_alert/bloc/chat/chat_bloc.dart';
+import 'package:pet_alert/models/ChatModel.dart';
 import 'package:pet_alert/repo/user_repo.dart';
 import 'package:pet_alert/widgets/list_chat_item.dart';
 
@@ -64,8 +67,14 @@ class ChatsList extends StatelessWidget {
           ),
           child: BlocBuilder<ChatBloc, ChatState>(
               builder: (context, state){
+                print("DSAJSLAJDSLJSDALJSALDASJLSADJLSJDSJALJSDALJDA $state");
                 if (state is ChatInitial) {
-                  BlocProvider.of<ChatBloc>(context).add(InitialChatEvent());
+                  BlocProvider.of<AuthBloc>(context).listen((state) {
+                    if(state is AuthenticatedState) {
+                      print("state ${state.userModel}");
+                      BlocProvider.of<ChatBloc>(context).add(InitialChatEvent(state.userModel));
+                    }
+                  });
                 }
                 if(state is ChatLoadedState) {
                   if (state.chats.length > -1) {

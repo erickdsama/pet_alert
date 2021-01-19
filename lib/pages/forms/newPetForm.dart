@@ -305,7 +305,7 @@ class _NewPetForm extends State<NewPetForm> {
                       Padding(
                           padding: EdgeInsets.all(8),
                           child:Image.file(
-                          _image != null ? _image : File("assets/images/perrito.jpeg"),
+                          _image != null ? _image : File("assets/images/perrito.jpg"),
                           width: MediaQuery.of(context).size.width,
                           fit: BoxFit.fitWidth,)
                       ),

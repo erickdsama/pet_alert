@@ -20,16 +20,21 @@ class NewPetPage extends StatelessWidget {
       navigationBar: CupertinoNavigationBar(
         middle: Text("Nueva Mascota", style: whiteTitle,),
         automaticallyImplyLeading: true,
-        actionsForegroundColor: Colors.white,
-        backgroundColor: primary,
+        backgroundColor: Color(0x0000000),
         border: null,
       ),
       child: Container(
+        decoration:  BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                stops: [0.3, 1],
+                colors: [primary, primarySecond]
+            )),
         constraints: BoxConstraints.expand(),
         child: Stack(
           children: [
             Container(
-              child: Container(color: primary,),
               constraints: new BoxConstraints.expand(height: 200.0),
             ),
             Positioned(

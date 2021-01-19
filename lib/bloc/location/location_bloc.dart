@@ -22,11 +22,12 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         print("position ${position.longitude} ");
 
         if (position != null) {
+          print("dslkjdsklajdkljsakljdsalkjad ${position.toString()}");
           yield LocationIsFetchedState(position: position);
         } else {
           yield LocationErrorState();
         }
-        yield LocationErrorState();
+        // yield LocationErrorState();
 
       }catch(e){
         print("$e");

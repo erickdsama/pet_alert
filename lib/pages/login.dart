@@ -12,18 +12,28 @@ class LoginPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      backgroundColor: const Color(0xFF24B299),
-      body:  Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset("assets/images/logo.png", fit: BoxFit.fitWidth, width: 180,),
-              Text(appName, style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),),
-              Divider(),
-              LoginForm()
-            ],
+
+      body:  Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: [0.3, 1],
+            colors: [primary, primarySecond]
           )
-        )
+        ),
+        child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset("assets/images/logo.png", fit: BoxFit.fitWidth, width: 180,),
+                Text(appName, style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),),
+                Divider(),
+                LoginForm()
+              ],
+            )
+          ),
+      )
     );
   }
 }

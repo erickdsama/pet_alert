@@ -5,11 +5,17 @@ import 'package:pet_alert/bloc/chat/chat_bloc.dart';
 import 'package:pet_alert/bloc/message_bloc.dart';
 import 'package:pet_alert/models/ChatModel.dart';
 import 'package:pet_alert/models/UserModel.dart';
+import 'package:pet_alert/repo/couchbase_repo.dart';
 import 'package:pet_alert/repo/user_repo.dart';
 
 class DirectMessageForm extends StatefulWidget{
+  final UserModel loginUser;
+  final UserModel reportAlertUser;
+
+  const DirectMessageForm({Key key, this.loginUser, this.reportAlertUser}) : super(key: key);
+
   @override
-  State<DirectMessageForm> createState() => _DirectMessageForm();
+  State<DirectMessageForm> createState() => _DirectMessageForm(loginUser: loginUser, reportAlertUser: reportAlertUser );
 }
 
 class _DirectMessageForm extends State<DirectMessageForm> {
@@ -18,6 +24,16 @@ class _DirectMessageForm extends State<DirectMessageForm> {
   ChatBloc chatBloc;
   MessageBloc messageBloc;
   UserRepo userRepo = UserRepo();
+  CouchBaseRepo couchBaseRepo;
+  UserModel loginUser;
+  UserModel reportAlertUser;
+  TextEditingController _directMessageController = TextEditingController();
+
+
+  _DirectMessageForm({
+    this.loginUser,
+    this.reportAlertUser
+  });
 
   @override
   void initState() {
@@ -25,11 +41,13 @@ class _DirectMessageForm extends State<DirectMessageForm> {
     ChatModel chatModel = ChatModel(
 
     );
-
-    messageBloc = MessageBloc(chatModel, chatBloc);
+    couchBaseRepo = CouchBaseRepo();
+    messageBloc = MessageBloc(chatModel, chatBloc, couchBaseRepo);
 
     super.initState();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +70,7 @@ class _DirectMessageForm extends State<DirectMessageForm> {
                     Expanded(
                       child: CupertinoTextField(
                         autofocus: true,
+                        controller: _directMessageController,
                         placeholder: "Hola buen día",
                         maxLines: 2,
 
@@ -61,19 +80,10 @@ class _DirectMessageForm extends State<DirectMessageForm> {
                       return CupertinoButton(
                           child: Text("Enviar"),
                           onPressed: () {
-                            chatBloc.add(NewChatEvent(UserModel(
-                              id: "1",
-                              name: "Pepe",
-                              email: "mail@a.com",
-                              photo: "https://scontent.fcjs2-1.fna.fbcdn.net/v/t1.0-9/72416855_962330480782002_2942232170342645760_o.jpg?_nc_cat=100&ccb=2&_nc_sid=09cbfe&_nc_eui2=AeH6pp4Wpyn5B8FBfpve2429GuZYHEmfHBga5lgcSZ8cGN0NsedhVjOU-LQSp0v9dmO_xFLJyZTDd94EQKYmprtK&_nc_ohc=oEqRiQow4tAAX-YeCtw&_nc_ht=scontent.fcjs2-1.fna&oh=4dd909e717e00159393c364ca6bfa22a&oe=601F585E"
-                            ), UserModel(
-                                id: "2",
-                                name: "Juan",
-                                email: "mail@a.com",
-                                photo: "https://scontent.fcjs2-1.fna.fbcdn.net/v/t1.0-9/72416855_962330480782002_2942232170342645760_o.jpg?_nc_cat=100&ccb=2&_nc_sid=09cbfe&_nc_eui2=AeH6pp4Wpyn5B8FBfpve2429GuZYHEmfHBga5lgcSZ8cGN0NsedhVjOU-LQSp0v9dmO_xFLJyZTDd94EQKYmprtK&_nc_ohc=oEqRiQow4tAAX-YeCtw&_nc_ht=scontent.fcjs2-1.fna&oh=4dd909e717e00159393c364ca6bfa22a&oe=601F585E"
-                            ), "message"));
-                            // messageBloc.add(SendMessage(message: "null"));
-
+                            chatBloc.add(NewChatEvent(
+                                loginUser,
+                                reportAlertUser,
+                                _directMessageController.text));
                           });
                     }, listener: (context, state){
 
@@ -84,5 +94,13 @@ class _DirectMessageForm extends State<DirectMessageForm> {
             )
       )
     );
+  }
+
+  @override
+  void dispose() async {
+    await chatBloc?.close();
+    await messageBloc?.close();
+    couchBaseRepo.dispose();
+    super.dispose();
   }
 }

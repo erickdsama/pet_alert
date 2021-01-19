@@ -35,7 +35,7 @@ class MessageModel{
       'sender': int.parse(this.owner.id),
       'receiver': int.parse(this.receiver.id),
       'message': this.message,
-      'timestamp': int.parse(this.sent),
+      'timestamp': this.sent != null ? int.parse(this.sent) :  DateTime.now().millisecondsSinceEpoch,
       'state': this.state,
       'id': this.id,
     };

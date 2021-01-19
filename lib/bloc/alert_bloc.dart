@@ -63,6 +63,8 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
       }catch(e){
         print("$e");
       }
+    } else if (event is AlertFetchingLocation) {
+      yield AlertLoadingState();
     }
   }
 }

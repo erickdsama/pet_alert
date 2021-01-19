@@ -7,9 +7,11 @@ abstract class MessageEvent extends Equatable {
 }
 
 class SendMessage extends MessageEvent {
+  final UserModel sender;
+  final UserModel receiver;
   final String message;
 
-  SendMessage({@required this.message});
+  SendMessage({@required this.message, this.sender, this.receiver,});
 
   @override
   List<Object> get props => [message];

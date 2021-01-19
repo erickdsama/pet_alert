@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_alert/models/AlertModel.dart';
+import 'package:pet_alert/models/PetModel.dart';
 import 'package:pet_alert/styles.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -15,8 +16,8 @@ class ListAlertItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    Map<dynamic, dynamic> pet = alertModel.pet;
-    String petName = pet["name"];
+    PetModel pet = alertModel.pet;
+    String petName = pet.name;
     var parsedDate = DateTime.parse(alertModel.lost_date);
     String missingDate = timeago.format(parsedDate, locale: 'es');
     return GestureDetector(
@@ -38,7 +39,7 @@ class ListAlertItem extends StatelessWidget {
                             height: 50,
                             child: ClipRRect(
                                 borderRadius: BorderRadius.circular(50.0),
-                                child: Image.network(pet['photo'], height: 50, width: 50, fit: BoxFit.fill )
+                                child: Image.network(pet.photo, height: 50, width: 50, fit: BoxFit.fill )
                             )
                         )
                     )

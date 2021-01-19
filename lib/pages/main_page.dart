@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,55 +10,56 @@ import 'package:pet_alert/pages/screens/list_screen.dart';
 import 'package:pet_alert/pages/screens/profile_screen.dart';
 import 'package:pet_alert/repo/AlertRepo.dart';
 import 'package:pet_alert/repo/PetRepo.dart';
-import 'package:pet_alert/repo/location.dart';
 import 'package:pet_alert/repo/user_repo.dart';
 
-LocationRepo locationRepo = LocationRepo();
-LocationBloc locationBloc = LocationBloc(locationRepo);
 
-
-//class MainPage extends StatefulWidget {
-//  @override
-//  _MainPageState createState() => _MainPageState();
-//}
-
-class MainTabPage extends StatelessWidget {
+class MainTabPage extends StatefulWidget {
 
   // BloC
+  @override
+  _MainTabPageState createState() => _MainTabPageState();
+}
+
+class _MainTabPageState extends State<MainTabPage> {
+  UniqueKey a = UniqueKey();
   PetBloc petBloc;
   AlertBloc alertBloc;
   AlertBloc myAlertsBloc;
   ChatBloc chatBloc;
-
-  //repos
   PetRepo petRepo = PetRepo();
   AlertRepo alertRepo = AlertRepo();
   UserRepo userRepo = UserRepo();
   CupertinoTabScaffold mainTabScaffold;
-
-  ListScreen listScreen = ListScreen();
+  ListScreen listScreen;
   ProfileScreen profileScreen = ProfileScreen();
-
-
   int currentScreen = 0;
   CupertinoTabController _tabController = CupertinoTabController(
     initialIndex: 0
   );
+
+  Widget blocProvider;
+  @override
+  void initState() {
+    super.initState();
+    listScreen = ListScreen(a.toString());
+    LocationBloc locationBloc = BlocProvider.of<LocationBloc>(context);
+    alertBloc = AlertBloc(alertRepo: alertRepo, locationBloc: locationBloc);
+    myAlertsBloc = AlertBloc(alertRepo: alertRepo);
+    petBloc = PetBloc(petRepo);
+    blocProvider =  MultiBlocProvider(
+        providers: [
+          BlocProvider<AlertBloc>.value(value: alertBloc)
+        ],
+        child: listScreen
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    print("cuantas veces entro");
     return CupertinoTabScaffold(
       controller: _tabController,
       tabBuilder: (BuildContext context, int index) {
-        print("when is callllllllll $index");
         if(index == 0) {
-          print("HEEEERRREEEEEE");
-          Widget blocProvider =  MultiBlocProvider(
-              providers: [
-                BlocProvider<AlertBloc>.value(value: alertBloc,)
-              ],
-              child: listScreen
-          );
           return blocProvider;
         } else if(index == 1) {
           return MultiBlocProvider(
@@ -87,16 +87,27 @@ class MainTabPage extends StatelessWidget {
       },
       tabBar: new CupertinoTabBar(
           items: [
-            BottomNavigationBarItem(icon: Icon(CupertinoIcons.paw_solid), label: "Mascotas"),
+            BottomNavigationBarItem(icon: Icon(CupertinoIcons.paw_solid), label: "Alertas"),
             BottomNavigationBarItem(icon: Icon(CupertinoIcons.add_circled_solid), label: "Agregar"),
             BottomNavigationBarItem(icon: Icon(CupertinoIcons.person_alt_circle), label: "Profile"),
           ]),
     );
   }
 
-
   CupertinoTabScaffold buildScaffold() {
 
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+
+    print("DISPOOOOOOOOOOSSSSSSEEEEEE");
+    alertBloc?.close();
+    petBloc?.close();
+    chatBloc?.close();
+    myAlertsBloc?.close();
+    alertBloc?.close();
+    // TODO: implement dispose
+  }
 }

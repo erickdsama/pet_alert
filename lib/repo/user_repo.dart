@@ -35,6 +35,7 @@ class UserRepo{
     if(result.statusCode != 200) {
       throw Exception("Error posting user");
     }else {
+      print("user -> ${result.body}");
       return UserModel.fromJSON(jsonDecode(result.body));
     }
   }
