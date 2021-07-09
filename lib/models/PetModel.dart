@@ -10,6 +10,7 @@ class PetModel{
   String breed;
   String color;
   String size;
+  String type;
   String disease;
   String medicates;
   double weight;
@@ -22,6 +23,7 @@ class PetModel{
     this.photo,
     this.id,
     this.breed,
+    this.type,
     this.color,
     this.weight,
     this.size,
@@ -40,6 +42,7 @@ class PetModel{
         breed: json['breed'],
         color: json['color'],
         size: json['size'],
+        type: json['type'],
         age: json['age'],
         sex: json['sex'],
         weight: json['weight'],
@@ -51,15 +54,17 @@ class PetModel{
   String toJSON() {
     return jsonEncode(<String, dynamic>{
       'name': this.name,
-      'photo': "https://c.files.bbci.co.uk/EB24/production/_112669106_66030514-b1c2-4533-9230-272b8368e25f.jpg",
+      'photo': this.photo,
       'breed': this.breed,
       'color': this.color,
       'size': this.size,
-      // 'weight': this.weight,
-      // 'age': this.age, todo fix api problem
+      'weight': this.weight,
+      'age': this.age,
       'sex': this.sex,
       'medicates': this.medicates,
       'diseases': this.disease,
+      'owner': this.owner.toMap(),
+      'type': this.type,
     });
   }
 

@@ -37,6 +37,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         );
         try {
           UserModel userCreated = await userRepo.postUser(userModel);
+          print("userC $userCreated");
           yield LoginSuccess(userModel: userCreated);
         } catch (e) {
           LoginError();

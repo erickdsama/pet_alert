@@ -14,7 +14,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({this.loginBloc}) {
     loginBlocSubscription = this.loginBloc.listen((state) {
       if (state is LoginSuccess) {
-        print("user model -> ${state.userModel.id}");
         add(AuthenticateUser(userModel: state.userModel));
       }
     });
@@ -32,6 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthEvent event,
   ) async* {
     if (event is AuthenticateUser) {
+      print("event ${event.userModel}");
       yield AuthenticatedState(userModel: event.userModel);
 
     }

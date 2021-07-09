@@ -7,10 +7,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pet_alert/bloc/auth/auth_bloc.dart';
+import 'package:pet_alert/bloc/auth/auth_state.dart';
 import 'package:pet_alert/bloc/pets/bloc.dart';
-import 'package:pet_alert/globals.dart';
 import 'package:pet_alert/models/PetModel.dart';
+import 'package:pet_alert/models/UserModel.dart';
+import 'package:pet_alert/repo/media_repo.dart';
 import 'package:pet_alert/styles.dart';
+import 'package:pet_alert/widgets/MultiSwitch.dart';
+import 'package:pet_alert/widgets/TextFormFieldBorder.dart';
 
 class NewPetForm extends StatefulWidget{
   @override
@@ -20,28 +25,41 @@ class NewPetForm extends StatefulWidget{
 final _formKey = GlobalKey<FormState>();
 
 class _NewPetForm extends State<NewPetForm> {
-  List<bool> _selectedSex = [true, false];
-  List<bool> _selectedType = [true, false];
-
-  File _image;
+  PetBloc petBloc;
+  PickedFile _image;
   PetModel _petModel = PetModel();
+  MediaRepo mediaRepo;
   _imgFromCamera() async {
-    File image = await ImagePicker.pickImage(
+    PickedFile image = await ImagePicker().getImage(
         source: ImageSource.camera, imageQuality: 50
     );
-
     setState(() {
       _image = image;
     });
   }
 
+  @override
+  void initState() {
+    petBloc = BlocProvider.of<PetBloc>(context);
+    mediaRepo = MediaRepo();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    petBloc?.close();
+    super.dispose();
+  }
+
   _imgFromGallery() async {
-    File image = await  ImagePicker.pickImage(
+    PickedFile image = await  ImagePicker().getImage(
         source: ImageSource.gallery, imageQuality: 50
     );
-
+    String fileName = await mediaRepo.uploadFile(image.path);
+    _petModel.photo = fileName;
     setState(() {
       _image = image;
+      print("image ${_image.path}");
     });
   }
 
@@ -77,7 +95,6 @@ class _NewPetForm extends State<NewPetForm> {
 
   @override
   Widget build(BuildContext context) {
-
     _petModel.sex = 1;
     return  Form(
           key: _formKey,
@@ -86,176 +103,79 @@ class _NewPetForm extends State<NewPetForm> {
                   padding: EdgeInsets.all(8),
                   child: Column(
                     children: [
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Nombre de la mascota", style: labels),
-                            TextFormField(
-                              onSaved: (cosa){
-                                _petModel.name = cosa;
-                              },
-                            ),
-                          ],
-                        ),
+                      TextInputFormBorder(
+                        onSaved: (string) {
+                          print("string $string");
+                          _petModel.name = string;
+                        },
+                        inputType: TextInputType.name,
+                        label: "Nombre",
+                        hint: "Escribe el nombre de tu mascota",
+                        suffix: "",
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Edad de la mascota", style: labels),
-                            TextFormField(
-                              decoration: InputDecoration(
-                                suffix: Padding(padding: EdgeInsets.all(2), child: Text("Año", style: dateList,)),
-                                hintText: "Escribe la edad de la mascota en años"
-                              ),
-                              onSaved: (edad){
-                                _petModel.age = double.parse(edad);
-                              },
-                            ),
-                          ],
-                        ),
+                      TextInputFormBorder(
+                        onSaved: (string) {
+                          _petModel.age = double.parse(string);
+                        },
+                        inputType: TextInputType.number,
+                        label: "Edad",
+                        hint: "Escribe la edad de la mascota",
+                        suffix: "Años",
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Tipo de mascota", style: labels),
-                            Row(
-                              children: [
-                                ToggleButtons(
-                                  children: [
-                                    Icon(FontAwesome5Solid.cat),
-                                    Icon(FontAwesome5Solid.dog)
-                                  ],
-                                  isSelected: _selectedType,
-                                  selectedColor: Colors.white,
-                                  fillColor: primary,
-                                  color: Colors.grey,
-                                  selectedBorderColor: primary,
-                                  borderColor: Colors.grey,
-                                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  onPressed: (index) {
-                                    setState(() {
-                                      _selectedType[index] = !_selectedType[index];
-                                    });
-                                  },
-
-
-                                ),
-
-                              ],
-                            )
-
-                          ],
-                        ),
+                      MultiSwitch(
+                        title: "Tipo de mascota",
+                        buttons: {
+                          "dog": Icon(FontAwesome5Solid.dog),
+                          "cat": Icon(FontAwesome5Solid.cat),
+                        },
+                        onSelected: (petType) {
+                          _petModel.type = petType == "dog" ? "Perro" : "Gato";
+                          print(petType);
+                        },
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Sexo", style: labels),
-                            Row(
-                              children: [
-                                ToggleButtons(
-                                  children: [
-                                    Icon(AntDesign.man),
-                                    Icon(AntDesign.woman)
-                                  ],
-                                  isSelected: _selectedSex,
-                                  selectedColor: Colors.white,
-                                  fillColor: primary,
-                                  color: Colors.grey,
-                                  selectedBorderColor: primary,
-                                  borderColor: Colors.grey,
-                                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                                  onPressed: (index) {
-                                    setState(() {
-                                      _petModel.sex = index;
-                                      if (index == 0) {
-                                        _selectedSex[0] = true;
-                                        _selectedSex[1] = false;
-                                      } else {
-                                        _selectedSex[0] = false;
-                                        _selectedSex[1] = true;
-                                      }
-                                    });
-                                  },
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
+                      MultiSwitch(
+                        title: "Genero de la mascota",
+                        buttons: {
+                          "female": Icon(AntDesign.woman),
+                          "man": Icon(AntDesign.man),
+                        },
+                        onSelected: (petSex) {
+                          _petModel.sex = petSex == "female" ? 0 : 1;
+                        },
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Raza", style: labels),
-                            CupertinoTextField(
-                              placeholder: "Ej. Husky",
-                              onChanged: (breed){
-                                _petModel.breed = breed;
-                              },
-                            ),
-                          ],
-                        ),
+                      TextInputFormBorder(
+                        label: "Raza",
+                        hint: "Escribe la raza de tu mascota",
+                        suffix: "",
+                        onSaved: (breed) {
+                          _petModel.breed = breed;
+                        },
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Color", style: labels,),
-                            CupertinoTextField(
-                              suffix: Padding(padding: EdgeInsets.all(2), child: Text("Año", style: dateList,)),
-                              suffixMode: OverlayVisibilityMode.editing,
-                              placeholder: "Ej. Negro y manchas blancas",
-                              onChanged: (color) {
-                                _petModel.color = color;
-                              },
-                            ),
-                          ],
-                        ),
+                      TextInputFormBorder(
+                        label: "Color",
+                        hint: "Ejemplo, Negro Manchas blancas",
+                        suffix: "",
+                        onSaved: (color) {
+                          _petModel.color = color;
+                        },
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Peso", style: labels,),
-                            CupertinoTextField(
-                              suffix: Padding(padding: EdgeInsets.all(2), child: Text("Año", style: dateList,)),
-                              suffixMode: OverlayVisibilityMode.editing,
-                              placeholder: "Ej. 2kg",
-                              onChanged: (weight) {
-                                _petModel.weight = double.parse(weight);
-                              },
-                            ),
-                          ],
-                        ),
+                      TextInputFormBorder(
+                        label: "Peso",
+                        hint: "Peso aproximado",
+                        suffix: "Kg",
+                        inputType: TextInputType.number,
+                        onSaved: (weight) {
+                          _petModel.weight = double.parse(weight);
+                        },
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Tamaño", style: labels,),
-                            CupertinoTextField(
-                              suffix: Padding(padding: EdgeInsets.all(2), child: Text("Año", style: dateList,)),
-                              suffixMode: OverlayVisibilityMode.editing,
-                              placeholder: "Ej. Gigante, Grande, mediano, pequeño ",
-                              onChanged: (size) {
-                                _petModel.size = size;
-                              },
-                            ),
-                          ],
-                        ),
+                      TextInputFormBorder(
+                        label: "Tamaño",
+                        hint: "Grande / Mediano / Chico ",
+                        suffix: "Kg",
+                        inputType: TextInputType.number,
+                        onSaved: (size) {
+                          _petModel.size = size;
+                        },
                       ),
                       Padding(
                         padding: EdgeInsets.all(8),
@@ -265,8 +185,6 @@ class _NewPetForm extends State<NewPetForm> {
                             Text("Si tu mascota tiene alguna discapacidad o problema congénito, descríbelo", style: labels,),
                             CupertinoTextField(
                               maxLines: 2,
-                              suffix: Padding(padding: EdgeInsets.all(2), child: Text("Año", style: dateList,)),
-                              suffixMode: OverlayVisibilityMode.editing,
                               placeholder: "Ej. Ceguera, epilepsía, sordera",
                               onChanged: (disease) {
                                 _petModel.disease = disease;
@@ -283,9 +201,7 @@ class _NewPetForm extends State<NewPetForm> {
                             Text("Si toma algún medicamento especifique", style: labels,),
                             CupertinoTextField(
                               maxLines: 2,
-                              suffix: Padding(padding: EdgeInsets.all(2), child: Text("Año", style: dateList,)),
-                              suffixMode: OverlayVisibilityMode.editing,
-                              placeholder: "Ej. 2 pastillas de X cosa c/8 horas",
+                              placeholder: "Ej. 2 pastillas de X  c/8 horas",
                               onChanged: (medicates) {
                                 _petModel.medicates = medicates;
                               },
@@ -305,23 +221,33 @@ class _NewPetForm extends State<NewPetForm> {
                       Padding(
                           padding: EdgeInsets.all(8),
                           child:Image.file(
-                          _image != null ? _image : File("assets/images/perrito.jpg"),
+                          _image != null ? File(_image.path) : File("assets/images/Snowball_II.png"),
                           width: MediaQuery.of(context).size.width,
                           fit: BoxFit.fitWidth,)
                       ),
-                      BlocConsumer<PetBloc, PetState>(
-                          builder: (context, state){
-                            return CupertinoButton(
-                                child: Text("Enviar"),
-                                onPressed: () {
-                                  _formKey.currentState.save();
-                                  PetBloc petBloc = BlocProvider.of(context);
-                                  petBloc.add(SavePet(petModel: _petModel));
-                                });
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, stateAuth) {
+                          UserModel userModel = stateAuth is AuthenticatedState ? stateAuth.userModel : null;
+                          return BlocConsumer<PetBloc, PetState>(
+                            builder: (context, state){
+                                return CupertinoButton(
+                                    child: Text("Enviar ${userModel.id}"),
+                                    onPressed: () {
+                                      _petModel.owner = userModel;
+                                      print("user ${userModel.toJSON()}");
+                                      petBloc.add(SavePet(petModel: _petModel));
+                                    });
                             },
-                          listener: (bloc, state){
-
-                          }),
+                            listener: (bloc, state){
+                              if(state is SavedPet) {
+                                print("Mascota guardad");
+                              }  else if (state is ErrorSavingPet) {
+                                print("error ");
+                              }
+                            }
+                          );
+                        },
+                      ),
                       Divider(),
                       SizedBox(
                         height: 40,

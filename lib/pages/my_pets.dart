@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:pet_alert/bloc/pets/bloc.dart';
-import 'package:pet_alert/models/PetModel.dart';
 import 'package:pet_alert/widgets/list_pet_item.dart';
 
 import '../styles.dart';
@@ -47,48 +46,55 @@ class MyPets extends StatelessWidget {
       ],
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return new CupertinoPageScaffold(
-      backgroundColor: Colors.white,
-      navigationBar: CupertinoNavigationBar(
-
-        middle: Text("Mis mascotas"),
-        trailing: CupertinoButton(
-          child: Icon(Icons.add),
-          onPressed: () {
-            Navigator.pushNamed(context, '/newPet', arguments: {});
-          },
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/dog_cat.png", ),
+            colorFilter: ColorFilter.mode(Colors.white.withAlpha(8), BlendMode.dstATop),
+            fit: BoxFit.contain,
+            alignment: Alignment.bottomCenter
+          )
         ),
-      ),
-      child: BlocBuilder<PetBloc, PetState>(
-          builder: (context, state){
-            print("dsalkjdlkasjldkjaslkdjlksajdlkasjdlkajlkjklsajdklsaj $state");
-            if(state is PetsIsLoadedState) {
-              if (state.petsModel.length > -1) {
-                return ListView.builder(
-                  padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
-                    itemCount: state.petsModel.length,
-                    itemBuilder: (BuildContext ctx, int idx) {
-                      return Dismissible(
-                        movementDuration: Duration(seconds: 2),
-                        dragStartBehavior: DragStartBehavior.down,
-                        background: Container(color: Colors.redAccent,),
-                        direction: DismissDirection.endToStart,
-                        key: Key(state.petsModel[idx].id),
-                        onDismissed: (direction) {
-                        },
-                        child: ListPetItem(petModel: state.petsModel[idx],)
-                      );
-                    });
-              } else {
-                return notPets(context);
-              }
-            } else {
-              return notPets(context);
-            }
-          })
+        child: CustomScrollView(
+          slivers : [
+            CupertinoSliverNavigationBar(
+              backgroundColor: Colors.transparent,
+              border: null,
+              largeTitle: Text("Mis Mascotas"),
+            ),
+            BlocBuilder<PetBloc, PetState>(
+                builder: (context, state){
+                  if(state is PetsIsLoadedState) {
+                    if (state.petsModel.length > 0) {
+                      print("ssss ${state.petsModel.length}");
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate((ctx, idx) {
+                          return Dismissible(
+                              movementDuration: Duration(seconds: 2),
+                              dragStartBehavior: DragStartBehavior.down,
+                              background: Container(color: Colors.redAccent,),
+                              direction: DismissDirection.endToStart,
+                              key: Key(state.petsModel[idx].id),
+                              onDismissed: (direction) {
+                              },
+                              child: ListPetItem(petModel: state.petsModel[idx],),
+                          );
+                        // }, childCount: 10)
+                        }, childCount: state.petsModel.length)
+                    );
+                    } else {
+                      return notPets(context);
+                    }
+                  } else {
+                    return notPets(context);
+                  }
+              }),
+          ],
+        ),
+      )
     );
   }
 }

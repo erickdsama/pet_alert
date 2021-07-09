@@ -17,7 +17,6 @@ class ListScreen extends StatefulWidget {
   static const String id = 'ListScreen';
 
   ListScreen(String key) {
-    print("KEY: $key");
   }
 
   @override

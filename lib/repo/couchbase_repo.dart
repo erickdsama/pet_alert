@@ -27,7 +27,6 @@ class CouchBaseRepo {
     if (channels != null) {
       config.channels = channels;
     }
-    print("chaneeels $channels");
     // config.authenticator = BasicAuthenticator("petApp", "passApp");
     replicator = Replicator(config);
     // Listen to replicator change events.
@@ -51,11 +50,9 @@ class CouchBaseRepo {
   Future<Document> createChat(UserModel receiver, UserModel owner, String message) async {
     await this.enableReplicas(
         dbChange: (dbChange){
-          print("XXXXXXXXXXXXXXXXXXXXXXXXX ${dbChange.documentIDs}");
 
         },
       replicaChange: (event) {
-          print("POPOPOPOPOPOPOPOPOPOPOPOPOPOPO $event");
 
       }
     );
@@ -75,7 +72,6 @@ class CouchBaseRepo {
     try {
       await database.saveDocument(doc);
     } on PlatformException{
-      print("Exception dasjdhgaskjdhaskhdjkshakjd sahdk jhaashkdsa");
       return null;
     }
     this.dispose();
@@ -97,10 +93,8 @@ class CouchBaseRepo {
     if (database == null) {
       await this.enableReplicas(
           dbChange: (dbChange) {
-            print("KUAKUAKAUAKAUAKUAKAUAKAAKAAKAUA ${dbChange.documentIDs}");
           },
           replicaChange: (event) {
-            print("OSAKODKSAODKSAODKOSAKDSOAKDOKSAODKSAOKDOSAKDOKASs $event");
           }
       );
     }
@@ -132,7 +126,6 @@ class CouchBaseRepo {
 
 
   void dispose() async{
-    print("cuando se hace dispose");
     await replicator?.removeChangeListener(_listenerToken);
     await replicator?.stop();
     await replicator?.dispose();

@@ -8,7 +8,6 @@ class PetBloc extends Bloc<PetsEvent, PetState> {
 
   PetRepo petRepo;
   PetBloc(this.petRepo){
-    print("here ${this.petRepo}");
   }
   @override
   PetState get initialState => PetsInitialState();
@@ -31,11 +30,16 @@ class PetBloc extends Bloc<PetsEvent, PetState> {
       }
     } else if(event is SavePet) {
       yield SavingPet();
-      PetModel petModel = await petRepo.savePet(event.petModel);
+      PetModel petModel;
+      try {
+        petModel = await petRepo.savePet(event.petModel);
+      } catch(e) {
+        yield ErrorSavingPet(error: e.toString());
+      }
       if (petModel != null) {
         yield SavedPet(petModel: petModel);
       } else {
-        yield ErrorSavingPet();
+        yield ErrorSavingPet(error: "Problem on saving Pet");
       }
     }
   }

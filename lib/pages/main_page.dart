@@ -22,7 +22,6 @@ class MainTabPage extends StatefulWidget {
 
 class _MainTabPageState extends State<MainTabPage> {
   UniqueKey a = UniqueKey();
-  PetBloc petBloc;
   AlertBloc alertBloc;
   AlertBloc myAlertsBloc;
   ChatBloc chatBloc;
@@ -45,7 +44,6 @@ class _MainTabPageState extends State<MainTabPage> {
     LocationBloc locationBloc = BlocProvider.of<LocationBloc>(context);
     alertBloc = AlertBloc(alertRepo: alertRepo, locationBloc: locationBloc);
     myAlertsBloc = AlertBloc(alertRepo: alertRepo);
-    petBloc = PetBloc(petRepo);
     blocProvider =  MultiBlocProvider(
         providers: [
           BlocProvider<AlertBloc>.value(value: alertBloc)
@@ -62,16 +60,10 @@ class _MainTabPageState extends State<MainTabPage> {
         if(index == 0) {
           return blocProvider;
         } else if(index == 1) {
-          return MultiBlocProvider(
-              providers: [
-                BlocProvider<PetBloc>.value(value: petBloc),
-              ],
-              child:  NewPetPage()
-          );
+          return NewPetPage();
         } else if(index == 2) {
           return MultiBlocProvider(
               providers: [
-                BlocProvider<PetBloc>.value(value: petBloc),
                 BlocProvider<AlertBloc>.value(value: myAlertsBloc),
                 BlocProvider<ChatBloc>.value(value: chatBloc)
               ], child: profileScreen
@@ -86,6 +78,8 @@ class _MainTabPageState extends State<MainTabPage> {
         }
       },
       tabBar: new CupertinoTabBar(
+          backgroundColor: Colors.white,
+          border: null,
           items: [
             BottomNavigationBarItem(icon: Icon(CupertinoIcons.paw_solid), label: "Alertas"),
             BottomNavigationBarItem(icon: Icon(CupertinoIcons.add_circled_solid), label: "Agregar"),
@@ -101,13 +95,9 @@ class _MainTabPageState extends State<MainTabPage> {
   @override
   void dispose() {
     super.dispose();
-
-    print("DISPOOOOOOOOOOSSSSSSEEEEEE");
     alertBloc?.close();
-    petBloc?.close();
     chatBloc?.close();
     myAlertsBloc?.close();
     alertBloc?.close();
-    // TODO: implement dispose
   }
 }

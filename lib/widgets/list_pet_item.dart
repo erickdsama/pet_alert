@@ -1,9 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:pet_alert/models/PetModel.dart';
-import 'package:pet_alert/styles.dart';
-import 'package:pet_alert/widgets/icon_text.dart';
+import 'package:pet_alert/utils.dart';
 
 
 class ListPetItem extends StatelessWidget {
@@ -15,62 +17,60 @@ class ListPetItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Color> listColors = [ Colors.amber[700], Colors.deepOrange[600], Colors.green[500], Colors.blue, Colors.teal, Colors.lightBlue[800]];
+    Random random = Random();
+    Color randomColor = listColors[random.nextInt(listColors.length-1)];
+    IconData iconAnimal = petModel.type == "perro" ? MaterialCommunityIcons.dog : MaterialCommunityIcons.cat;
+
     return GestureDetector(
       onTap: () => {
         Navigator.pushNamed(context, '/petDetail', arguments: petModel)
       },
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Card(
-          elevation: 2,
-            child: Column(
-              children: [
-                Container(
-                  constraints: new BoxConstraints.expand(height: 200),
-                  child: Image.network(petModel.photo, fit: BoxFit.fitWidth, width: MediaQuery.of(context).size.width,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          elevation: 0,
+            color: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(petModel.name, style: titleList,),
-                      Icon(FontAwesome5Solid.dog)
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          height: 60,
+                          margin: EdgeInsets.all(0),
+                          decoration: BoxDecoration(
+                            color: randomColor,
+                            shape: BoxShape.circle
+                          ),
+                          child: Icon(iconAnimal, color: Colors.white, size: 40,),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 10,
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+                                child: Text("Mi nombre es ${petModel.name}", style: Theme.of(context).textTheme.headline6.copyWith(fontWeight: FontWeight.bold),),
+                              ),
+                              Text("${capitalize(petModel.type)} ${petModel.sex == 1 ? 'Macho' : 'Hembra'} de ${petModel.age} años", style: Theme.of(context).textTheme.bodyText2,),
+                            ],
+                          ),
+                        ),
+                      )
                     ],
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconText(iconData: FontAwesome5Solid.dna, text: petModel.breed),
-                      VerticalDivider(),
-                      IconText(iconData: Ionicons.ios_color_palette, text: petModel.color),
-                      VerticalDivider(),
-                      IconText(iconData: (petModel.sex != 1) ? FontAwesome.mars : FontAwesome.venus, text:  (petModel.sex != 1) ? "Macho" : "Hembra" ),
-                      VerticalDivider(),
-                      IconText(iconData: MaterialCommunityIcons.image_size_select_small, text: petModel.size),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CupertinoButton(
-                          child: Text("Crear Alerta", style: btnTextWhite,),
-                          color: Colors.redAccent,
-                          padding: EdgeInsets.all(8),
-                          onPressed: (){
-                      })
-
-                    ],
-                  ),
-                )
-              ],
+                ],
+              ),
             )
         ),
       )

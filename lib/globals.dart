@@ -6,9 +6,10 @@ const appName = "PetAlert";
 
 const primary =  Color(0xFF24B299);
 const primarySecond =  Color(0xFF0066AA);
+const accentColor = Color(0xFFff6633);
 const greyLight = Color(0xFFFAFAFA);
 
-const API_URL = "http://";
 
 const database_name = "pet_alert_xxxxsdsdssaa";
-const URL_WS = "ws://138.68.249.12:4984/pet_alert/";
+const URL_WS = "ws://192.168.3.6:8001/";
+const URL_API = "192.168.3.6:5000";

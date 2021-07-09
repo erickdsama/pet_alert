@@ -14,7 +14,6 @@ class AlertModel{
   AlertModel({this.lostPoint, this.description, this.pet, this.pet_id, this.lost_date});
 
   factory AlertModel.fromJSON(Map<String, dynamic> json) {
-    print(">>>>>>> alert >>> ${json['owner']}");
     return AlertModel(
       description: json["description"],
       lostPoint: json["lost_point"],

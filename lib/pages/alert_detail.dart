@@ -204,7 +204,6 @@ class AlertDetailPage extends StatelessWidget{
                                                   bloc: BlocProvider.of<AuthBloc>(context),
                                                   builder: (context, state) {
                                                     if (state is AuthenticatedState) {
-                                                      print("state ${state.userModel}");
                                                       return DirectMessageForm(
                                                         loginUser: state.userModel,
                                                         reportAlertUser: alertModel.pet.owner,

@@ -58,7 +58,6 @@ class MyAlerts extends StatelessWidget {
           builder: (context, state){
             if(state is AlertIsLoadedState) {
               if (state.alertModels.length > -1 ) {
-                print("que pedo que pedo");
                 return ListView.builder(
                   itemCount: state.alertModels.length,
                   itemBuilder: (BuildContext ctx, int idx) {

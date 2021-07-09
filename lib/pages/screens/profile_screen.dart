@@ -9,6 +9,7 @@ import 'package:pet_alert/bloc/chat/chat_bloc.dart';
 import 'package:pet_alert/bloc/pets/bloc.dart';
 import 'package:pet_alert/models/AlertModel.dart';
 import 'package:pet_alert/models/PetModel.dart';
+import 'package:pet_alert/repo/PetRepo.dart';
 import 'package:pet_alert/styles.dart';
 import 'package:pet_alert/utils.dart';
 
@@ -33,18 +34,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     alertBloc = BlocProvider.of<AlertBloc>(context);
     petBloc = BlocProvider.of<PetBloc>(context);
-
+    alertBloc.add(FetchMyAlerts());
+    petBloc.listen((state) {
+      if(state is PetsInitialState || state is SavedPet) {
+        petBloc.add(FetchPets());
+      }
+    });
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    alertBloc.add(FetchMyAlerts());
-    petBloc.listen((state) {
-      if(state is PetsInitialState) {
-        BlocProvider.of<PetBloc>(context).add(FetchPets());
-      }
-    });
-
     return CupertinoPageScaffold(
       backgroundColor: Colors.white,
       navigationBar: CupertinoNavigationBar(
@@ -107,7 +106,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             },
                         )
                     ),
-                    Material(
+                    BlocProvider(
+                        create: (context) => petBloc,
+                        child: Material(
                         child: ListTile(
                           onTap: () {
                             Navigator.pushNamed(context, '/myPets', arguments: {});
@@ -121,18 +122,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                List<PetModel> pets = state.petsModel;
                                return Text("${pets.length}");
                              } else {
-                               Text("");
+                               Text("0");
                              }
-                             return Text("");
+                             return Text("0");
                             }
                           )
                         )
+                    ),
                     ),
                     Material(
                         child: ListTile(
                           onTap: () {
                             Navigator.pushNamed(context, '/myAlerts', arguments: {});
-
                           },
                           title: Text("Mis Alertas", style: titleList,),
                           trailing: BlocBuilder<AlertBloc, AlertState>(
@@ -168,7 +169,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void dispose() {
     alertBloc?.close();
-    petBloc?.close();
     chatBloc?.close();
     super.dispose();
   }

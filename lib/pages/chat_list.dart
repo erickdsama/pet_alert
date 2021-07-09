@@ -67,11 +67,9 @@ class ChatsList extends StatelessWidget {
           ),
           child: BlocBuilder<ChatBloc, ChatState>(
               builder: (context, state){
-                print("DSAJSLAJDSLJSDALJSALDASJLSADJLSJDSJALJSDALJDA $state");
                 if (state is ChatInitial) {
                   BlocProvider.of<AuthBloc>(context).listen((state) {
                     if(state is AuthenticatedState) {
-                      print("state ${state.userModel}");
                       BlocProvider.of<ChatBloc>(context).add(InitialChatEvent(state.userModel));
                     }
                   });

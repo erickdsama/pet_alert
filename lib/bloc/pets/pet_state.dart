@@ -34,4 +34,12 @@ class SavedPet extends PetState {
   List<Object> get props => [petModel];
 }
 
-class ErrorSavingPet extends PetState {}
+class ErrorSavingPet extends PetState {
+  final String error;
+
+  ErrorSavingPet({@required this.error});
+
+  @override
+  List<Object> get props => [error];
+
+}

@@ -31,7 +31,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ChatState get initialState => ChatInitial();
 
   Future<Map<String,UserModel>> getAllDocsUsers(List<Document> result) async {
-    print("result $result");
     Map<String, UserModel> idUsersModel = {};
     List<String> idsSender = result.map((x) => getResultData(x, "sender").toString()).toList();
     List<String> idsReceiver = result.map((x) => getResultData(x, "receiver").toString()).toList();
@@ -80,10 +79,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       couchBaseRepo.enableReplicas(
           channels: ['sender_'+event.loggedUser.id.toString()],
           replicaChange: (event){
-            print("event $event");
 
           }, dbChange: (dbChange){
-            print("el bueno db ${dbChange.documentIDs}");
             add(UpdateChatList(dbChange.documentIDs));
           });
       // Create a query to fetch documents.

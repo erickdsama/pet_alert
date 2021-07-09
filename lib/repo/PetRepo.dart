@@ -1,34 +1,35 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:pet_alert/globals.dart';
 import 'package:pet_alert/models/PetModel.dart';
 
 class PetRepo{
 
   Future<List<PetModel>> fetchMyPets() async{
-    var url = 'http://167.99.170.7:5000/pet/';
-
-    final result = await http.get(url);
+    Uri uri = Uri.http(URL_API, 'pet');
+    final result = await http.get(uri);
     if(result.statusCode != 200) {
       throw Exception("PETTTTSSS ERROR");
     }else {
-      return parsedJSON(result);
+      if(result != null) {
+        return parsedJSON(result);
+      } else {
+        return [];
+      }
     }
   }
 
   Future<PetModel> savePet(final data) async{
     assert(data != null);
-
-    var url = 'http://167.99.170.7:5000/pet/';
-    print("sdad ${data.toJSON()}");
+    Uri uri = Uri.http(URL_API, 'pet/');
     Map<String, String> headers = {
       "Content-Type":"application/json"
     };
-    final result = await http.post(url, body: data.toJSON(), headers: headers);
+    final result = await http.post(uri, body: data.toJSON(), headers: headers);
     if(result.statusCode != 200) {
-      throw Exception("PETTTTSSS ERROR");
+      throw Exception(result.body);
     }else {
-      print("dsada ${result.body}");
       return PetModel.fromJSON(json.decode(result.body));
     }
   }
